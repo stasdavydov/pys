@@ -17,7 +17,7 @@ setup(name='pys',
       author_email="davidovsv@yandex.ru",
       license="MIT",
       classifiers=[
-          "Development StatusDevelopment Status :: 5 - Production/Stable",
+          "Development Status :: Development Status :: 5 - Production/Stable",
           "License :: OSI Approved :: MIT License",
           "Operating System :: OS Independent",
           "Framework :: Pydantic",
