@@ -7,7 +7,7 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-setup(name='pys',
+setup(name='py-s',
       version='0.0.1',
       description='Simple file storage for pydantic models, thread and multiprocess safe',
       long_description=README,
