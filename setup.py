@@ -31,7 +31,7 @@ setup(name='py-s',
       packages=['pys'],
       include_package_data=False,
       install_requires=[
-          'pydantic',
-          'filelock',
+          'pydantic==2.7.4',
+          'filelock==3.15.4',
       ],
       )
