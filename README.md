@@ -3,7 +3,7 @@ Simple file storage for `pydantic` models, thread and multiprocess safe
 
 ## Installation
 ```shell
-pip install pys
+pip install py-s
 ```
 
 ## Usage

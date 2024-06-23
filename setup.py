@@ -7,8 +7,8 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-setup(name='pys',
-      version='0.0.1',
+setup(name='py-s',
+      version='0.0.2',
       description='Simple file storage for pydantic models, thread and multiprocess safe',
       long_description=README,
       long_description_content_type="text/markdown",
@@ -17,7 +17,7 @@ setup(name='pys',
       author_email="davidovsv@yandex.ru",
       license="MIT",
       classifiers=[
-          "Development StatusDevelopment Status :: 5 - Production/Stable",
+          "Development Status :: 5 - Production/Stable",
           "License :: OSI Approved :: MIT License",
           "Operating System :: OS Independent",
           "Framework :: Pydantic",
@@ -31,7 +31,7 @@ setup(name='pys',
       packages=['pys'],
       include_package_data=False,
       install_requires=[
-          'pydantic',
-          'filelock',
+          'pydantic==2.7.4',
+          'filelock==3.15.4',
       ],
       )
