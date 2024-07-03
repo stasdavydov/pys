@@ -1,32 +1,58 @@
 import abc
+import json
 import shutil
 import uuid
+from dataclasses import is_dataclass, asdict
 from pathlib import Path
-from typing import Any, TypeVar
-from typing import Type, Optional, Tuple, Iterable
-
+from typing import Type, Optional, Tuple, Iterable, Any
+from typing import TypeVar
 from filelock import FileLock
-from pydantic import BaseModel
 
 
-class ModelWithID(BaseModel):
-    """
-    Base class for models with `id` field prefilled with random UUID if not initialized.
-    """
-    id: str = None
+def saveable(cls=None, /, field_as_id: str = 'id'):
+    def wrapper(cls):
+        def my_id_or_default(self):
+            __default_id__ = '__default_id__'
+            if hasattr(self, field_as_id):
+                if getattr(self, field_as_id, None) is None:
+                    setattr(self, field_as_id, str(uuid.uuid4()))
+                return getattr(self, field_as_id)
+            elif hasattr(self, '__loaded_id__'):
+                setattr(self, __default_id__, getattr(self, '__loaded_id__'))
+            elif getattr(self, __default_id__, None) is None:
+                setattr(self, __default_id__, str(uuid.uuid4()))
+            return getattr(self, __default_id__)
 
-    def __init__(self, **data: Any) -> None:
-        """
-        Initialize a model
-        :param data: model fields
-        """
-        super().__init__(**data)
-        if self.id is None:
-            self.id = str(uuid.uuid4())
+        setattr(cls, '__my_id__', my_id_or_default)
+        if not hasattr(cls, '__json__'):
+            if is_dataclass(cls):
+                setattr(cls, '__json__',
+                        lambda self:
+                            json.dumps(
+                                asdict(self),
+                                separators=(',', ':')
+                            )
+                        )
+            elif is_pydantic(cls):
+                setattr(cls, '__json__', lambda self: self.model_dump_json())
+            else:
+                raise NotImplementedError(
+                    f'The class {cls} is not @dataclass nor Pydantic Model and does not have __json__() method.'
+                    f'Please implement __json__() method by yourself.')
+        return cls
+
+    if cls is None:
+        return wrapper
+    else:
+        return wrapper(cls)
 
 
-StoredModel = TypeVar('StoredModel', bound=ModelWithID)
-RelatedModel = TypeVar('RelatedModel', bound=ModelWithID)
+def is_pydantic(cls):
+    return any(filter(lambda c: c.__name__ == 'BaseModel', cls.__mro__))
+
+
+StoredModel = TypeVar('StoredModel')
+RelatedModel = TypeVar('RelatedModel')
 
 
 class BaseStorage(abc.ABC):
@@ -47,12 +73,13 @@ class BaseStorage(abc.ABC):
         raise NotImplementedError
 
     def save(self, model: StoredModel,
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> None:
+             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Any:
         """
         Save model.
 
         :param model: A model.
         :param related_model: Related model(s) -- model that the stored model is belong to.
+        :return Returns saved model id
         """
         raise NotImplementedError
 
@@ -102,7 +129,7 @@ class FileStorage(BaseStorage):
                 if isinstance(model, tuple):
                     path /= FileStorage._get_model_path(*model)
                 else:
-                    path /= FileStorage._get_model_path(model.__class__, model.id)
+                    path /= FileStorage._get_model_path(model.__class__, model.__my_id__())
 
         return path / model_class.__name__ / model_id
 
@@ -114,11 +141,13 @@ class FileStorage(BaseStorage):
         return path, FileLock(lock)
 
     def save(self, model: StoredModel,
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> None:
-        path, lock = self._prepare_file(model.__class__, model.id, *related_model)
+             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Any:
+        model_id = model.__my_id__()
+        path, lock = self._prepare_file(model.__class__, model_id, *related_model)
         with lock:
             with path.open('w', encoding='UTF-8') as f:
-                f.write(model.json())
+                f.write(model.__json__())
+                return model_id
 
     def load(self, model_class: Type[StoredModel], model_id: str,
              *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Optional[StoredModel]:
@@ -126,7 +155,14 @@ class FileStorage(BaseStorage):
         with lock:
             if not path.exists():
                 return None
-            return model_class.parse_file(path)
+            with open(path, 'r') as f:
+                content = json.load(f)
+            if is_pydantic(model_class):
+                model = model_class.model_validate(content)
+            else:
+                model = model_class(**content)
+            setattr(model, '__loaded_id__', model_id)
+            return model
 
     def delete(self, model_class: Type[StoredModel], model_id: str,
                *related_model: RelatedModel | Tuple[RelatedModel, str]) -> None:
@@ -153,4 +189,4 @@ def storage(base_path: str | Path):
     return FileStorage(base_path)
 
 
-__all__ = ('ModelWithID', 'storage', )
+__all__ = ('saveable', 'storage', )

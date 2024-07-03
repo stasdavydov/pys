@@ -1,13 +1,17 @@
+from pydantic import BaseModel
+
 import pys
 
 
 # An author
-class Author(pys.ModelWithID):
+@pys.saveable
+class Author(BaseModel):
     name: str
 
 
 # And a book
-class Book(pys.ModelWithID):
+@pys.saveable
+class Book(BaseModel):
     title: str
 
 

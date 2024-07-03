@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from pydantic import BaseModel
-import pys
+from pys.pydantic import ModelWithID
 
 
 class Created(BaseModel):
@@ -14,7 +14,7 @@ class Created(BaseModel):
             self.created = datetime.utcnow().isoformat()
 
 
-class BotBrief(pys.ModelWithID, Created):
+class BotBrief(ModelWithID, Created):
     name: str
     enabled: bool = True
 
@@ -26,7 +26,7 @@ class Bot(BotBrief):
     pages: Optional[Any] = None
 
 
-class User(pys.ModelWithID):
+class User(ModelWithID):
     username: str
     first_name: str
     last_name: str
@@ -40,5 +40,5 @@ class ResponseContent(BaseModel):
     content: Optional[Any] = None
 
 
-class BotResponse(pys.ModelWithID, ResponseContent, Created):
+class BotResponse(ModelWithID, ResponseContent, Created):
     author: User

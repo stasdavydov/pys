@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/py-s
+      url: https://pypi.org/p/pysdato
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -107,7 +107,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/py-s
+      url: https://test.pypi.org/p/pysdato
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
