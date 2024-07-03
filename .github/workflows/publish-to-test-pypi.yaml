@@ -16,7 +16,7 @@ jobs:
     - name: Instal dependency and test environment
       run: |
         pip install -r requirements.txt
-        pip install pytest
+        pip install pydantic pytest
     - name: Run tests
       run: pytest tests
 
