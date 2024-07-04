@@ -4,7 +4,7 @@ import shutil
 import uuid
 from dataclasses import is_dataclass, asdict
 from pathlib import Path
-from typing import Type, Optional, Tuple, Iterable, Any
+from typing import Type, Optional, Tuple, Iterable, Any, Union
 from typing import TypeVar
 from filelock import FileLock
 
@@ -53,6 +53,7 @@ def is_pydantic(cls):
 
 StoredModel = TypeVar('StoredModel')
 RelatedModel = TypeVar('RelatedModel')
+Related = Union[RelatedModel, Tuple[RelatedModel, str]]
 
 
 class BaseStorage(abc.ABC):
@@ -60,7 +61,7 @@ class BaseStorage(abc.ABC):
     Abstract base storage
     """
     def load(self, model_class: Type[StoredModel], model_id: str,
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) \
+             *related_model: Related) \
             -> Optional[StoredModel]:
         """
         Load model.
@@ -73,7 +74,7 @@ class BaseStorage(abc.ABC):
         raise NotImplementedError
 
     def save(self, model: StoredModel,
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Any:
+             *related_model: Related) -> Any:
         """
         Save model.
 
@@ -84,7 +85,7 @@ class BaseStorage(abc.ABC):
         raise NotImplementedError
 
     def delete(self, model_class: Type[StoredModel], model_id: str,
-               *related_model: RelatedModel | Tuple[RelatedModel, str]) -> None:
+               *related_model: Related) -> None:
         """
         Delete model.
 
@@ -95,7 +96,7 @@ class BaseStorage(abc.ABC):
         raise NotImplementedError
 
     def list(self, model_class: Type[StoredModel],
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Iterable[StoredModel]:
+             *related_model: Related) -> Iterable[StoredModel]:
         """
         List models.
         :param model_class: Model class
@@ -111,7 +112,7 @@ class FileStorage(BaseStorage):
     """
     base_path: Path
 
-    def __init__(self, base_path: str | Path) -> None:
+    def __init__(self, base_path: Union[str, Path]) -> None:
         """
         Base path for the storage files
         :param base_path: base path.
@@ -120,7 +121,7 @@ class FileStorage(BaseStorage):
 
     @staticmethod
     def _get_model_path(model_class: Type[StoredModel], model_id: str,
-                        *related_model: RelatedModel | Tuple[Type[RelatedModel], str]) -> Path:
+                        *related_model: Union[RelatedModel, Tuple[Type[RelatedModel], str]]) -> Path:
         path = Path()
         if not related_model:
             path /= ''
@@ -134,14 +135,14 @@ class FileStorage(BaseStorage):
         return path / model_class.__name__ / model_id
 
     def _prepare_file(self, model_class: Type[StoredModel], model_id: str,
-                      *related_model: RelatedModel | Tuple[RelatedModel, str]):
+                      *related_model: Related):
         path = self.base_path / FileStorage._get_model_path(model_class, model_id, *related_model).with_suffix('.json')
         lock = path.with_suffix('.lock')
         path.parent.mkdir(parents=True, exist_ok=True)
         return path, FileLock(lock)
 
     def save(self, model: StoredModel,
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Any:
+             *related_model: Related) -> Any:
         model_id = model.__my_id__()
         path, lock = self._prepare_file(model.__class__, model_id, *related_model)
         with lock:
@@ -150,7 +151,7 @@ class FileStorage(BaseStorage):
                 return model_id
 
     def load(self, model_class: Type[StoredModel], model_id: str,
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Optional[StoredModel]:
+             *related_model: Related) -> Optional[StoredModel]:
         path, lock = self._prepare_file(model_class, model_id, *related_model)
         with lock:
             if not path.exists():
@@ -165,7 +166,7 @@ class FileStorage(BaseStorage):
             return model
 
     def delete(self, model_class: Type[StoredModel], model_id: str,
-               *related_model: RelatedModel | Tuple[RelatedModel, str]) -> None:
+               *related_model: Related) -> None:
         path, lock = self._prepare_file(model_class, model_id, *related_model)
         with lock:
             path.unlink(missing_ok=True)
@@ -174,7 +175,7 @@ class FileStorage(BaseStorage):
                 shutil.rmtree(sub_path)
 
     def list(self, model_class: Type[StoredModel],
-             *related_model: RelatedModel | Tuple[RelatedModel, str]) -> Iterable[StoredModel]:
+             *related_model: Related) -> Iterable[StoredModel]:
 
         path, lock = self._prepare_file(model_class, '__list__', *related_model)
         with lock:
@@ -185,7 +186,7 @@ class FileStorage(BaseStorage):
         return f'file.Storage(base_path={self.base_path})'
 
 
-def storage(base_path: str | Path):
+def storage(base_path: Union[str, Path]):
     return FileStorage(base_path)
 
 

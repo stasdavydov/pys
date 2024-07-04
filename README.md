@@ -134,3 +134,11 @@ storage.delete(ModelClass, model_id, [related_model | (RelatedModelClass, relate
 # List models by specified ModelClass with optional relation to other models
 storage.list(ModelClass, [related_model | (RelatedModelClass, related_model_id), ...])
 ```
+
+## Release Notes
+
+### 0.0.2
+Added support for Python 3.x < 3.10
+
+### 0.0.1 
+Initial public release
