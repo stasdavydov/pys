@@ -1,0 +1,21 @@
+name: Build and test
+
+on: push
+
+jobs:
+  build:
+    name: Build and run tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+    - name: Instal dependency and test environment
+      run: |
+        pip install -r requirements.txt
+        pip install pydantic pytest
+    - name: Run tests
+      run: pytest tests

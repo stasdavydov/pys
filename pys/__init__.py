@@ -1,5 +1,6 @@
 import abc
 import json
+import os
 import shutil
 import uuid
 from dataclasses import is_dataclass, asdict
@@ -174,13 +175,15 @@ class FileStorage(BaseStorage):
             if sub_path.exists():
                 shutil.rmtree(sub_path)
 
+    _JSON_EXT_END = -5
+
     def list(self, model_class: Type[StoredModel],
              *related_model: Related) -> Iterable[StoredModel]:
-
         path, lock = self._prepare_file(model_class, '__list__', *related_model)
         with lock:
-            for p in path.parent.glob('*.json'):
-                yield self.load(model_class, p.with_suffix('').name, *related_model)
+            for p in os.listdir(path.parent):
+                if p.endswith('.json'):
+                    yield self.load(model_class, p[:FileStorage._JSON_EXT_END], *related_model)
 
     def __str__(self) -> str:
         return f'file.Storage(base_path={self.base_path})'

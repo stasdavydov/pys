@@ -1,6 +1,6 @@
 # Python Object Storage 
 
-Simple fast JSON file storage for Python dataclasses and Pydantic models, thread and multiprocess safe. 
+Simple JSON file storage for Python dataclasses and Pydantic models, thread and multiprocess safe. 
 
 ----
 
@@ -83,7 +83,7 @@ assert gpt_war_and_peace is not None
 ```
 
 We may have as many dependant models as we need. Actually, it's the way to have model dependent indexes
-that let us easily faster get (dependent) model list by another model.
+that let us easily get (dependent) model list by another model.
 ```python
 from pydantic import BaseModel
 import pys
@@ -136,6 +136,10 @@ storage.list(ModelClass, [related_model | (RelatedModelClass, related_model_id),
 ```
 
 ## Release Notes
+
+### 0.0.3
+Benchmark is added, performance is improved.
+Fixed dependency set up.
 
 ### 0.0.2
 Added support for Python 3.x < 3.10
