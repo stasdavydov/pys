@@ -1,25 +1,21 @@
-import shutil
-from pathlib import Path
+import pytest
 
-
-from .model import BotOwner, Bot, BotResponse
 import pys
+from tests.model import BotOwner, Bot, BotResponse
 
-base_path = Path(__file__).parent / '.storage'
-shutil.rmtree(base_path, ignore_errors=True)
-base_path.mkdir(parents=True, exist_ok=False)
-storage = pys.storage(base_path)
-
-
-def test_file_storage():
-    bot_owner = BotOwner(username='itisme', first_name='Test', last_name='Tester')
-    assert storage.base_path.absolute() == base_path.absolute()
-    path, _ = storage._prepare_file(BotOwner, bot_owner.id)
-    assert path.absolute() == (base_path / 'BotOwner' / bot_owner.id).with_suffix('.json').absolute()
-    storage.delete(bot_owner.__class__, bot_owner.id)
+storages = [
+    pys.file_storage('tests.storage'),
+    pys.sqlite_storage('tests.db'),
+]
 
 
-def test_load():
+@pytest.fixture(params=storages)
+def storage(request):
+    s = request.param
+    yield s
+
+
+def test_load(storage):
     owner = BotOwner(username='itisme', first_name='Test', last_name='Tester')
     storage.save(owner)
     bot_owner = storage.load(BotOwner, owner.id)
@@ -31,18 +27,15 @@ def test_load():
     storage.delete(bot_owner.__class__, bot_owner.id)
 
 
-def test_save():
+def test_save(storage):
     bot_owner2a = BotOwner(first_name='Second', last_name='', username='')
     storage.save(bot_owner2a)
-    assert (storage.base_path / 'BotOwner' / bot_owner2a.id).with_suffix('.json').exists()
     bot_owner2b = storage.load(BotOwner, bot_owner2a.id)
     assert bot_owner2b == bot_owner2a
-
     storage.delete(BotOwner, bot_owner2a.id)
-    assert not (storage.base_path / 'BotOwner' / bot_owner2a.id).with_suffix('.json').exists()
 
 
-def test_related_model():
+def test_related_model(storage):
     bot_owner2 = BotOwner(first_name='Second', last_name='Owner', username='')
     bot_owner3 = BotOwner(first_name='Third', last_name='Owner', username='')
     storage.save(Bot(id='3', name='A bot'), bot_owner2)
@@ -60,7 +53,7 @@ def test_related_model():
     storage.delete(bot_owner3.__class__, bot_owner3.id)
 
 
-def test_related_models():
+def test_related_models(storage):
     bot_owner = BotOwner(first_name='Second', last_name='Owner', username='')
     bot = Bot(id='1', name='A bot')
     storage.save(bot, bot_owner)
@@ -78,7 +71,7 @@ def test_related_models():
     storage.delete(bot_owner.__class__, bot_owner.id)
 
 
-def test_list():
+def test_list(storage):
     bot_owner = BotOwner(first_name='Second', last_name='Owner', username='')
     storage.save(Bot(id='1', name='Bot #1'), bot_owner)
     storage.save(Bot(id='2', name='Bot #2'), bot_owner)
@@ -91,3 +84,8 @@ def test_list():
         assert bot.id in bot_ids
 
     storage.delete(bot_owner.__class__, bot_owner.id)
+
+
+def test_tear_down():
+    for s in storages:
+        s.destroy()

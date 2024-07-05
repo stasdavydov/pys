@@ -1,4 +1,3 @@
-import shutil
 import time
 
 import msgspec
@@ -6,13 +5,15 @@ import msgspec
 import pys
 
 
-@pys.saveable(field_as_id='name')
+@pys.saveable(field_as_id='id')
 class Author(msgspec.Struct):
+    id: str
     name: str
 
 
-@pys.saveable(field_as_id='title')
+@pys.saveable(field_as_id='id')
 class Book(msgspec.Struct):
+    id: str
     author_id: str
     title: str
 
@@ -20,48 +21,48 @@ class Book(msgspec.Struct):
 AUTHORS = 100
 BOOKS = 5
 
-STORAGE = '.benchmark'
-shutil.rmtree(STORAGE, ignore_errors=True)
-s = pys.storage(STORAGE)
+storages = (
+    pys.file_storage('benchmark.storage'),
+    pys.sqlite_storage('benchmark.db'),
+)
+for s in storages:
+    start = time.time_ns()
+    for i in range(0, AUTHORS):
+        author = Author(id=str(i), name=f'Author {i}')
+        s.save(author)
+        for j in range(0, BOOKS):
+            book = Book(id=str(i*AUTHORS + j), title=f'Book {i}-{j}', author_id=author.__my_id__())
+            s.save(book, author)
+            s.save(book)
+    end = time.time_ns()
+    t1 = end - start
 
-start = time.time()
-for i in range(0, AUTHORS):
-    author = Author(name=f'Author {i}')
-    s.save(author)
-    for j in range(0, BOOKS):
-        book = Book(title=f'Book {i}-{j}', author_id=author.__my_id__())
-        s.save(book, author)
-        s.save(book)
-end = time.time()
-t1 = end - start
+    start = time.time_ns()
+    authors_found = list(s.list(Author))
+    assert AUTHORS == len(authors_found)
+    end = time.time_ns()
+    t2 = end - start
 
+    start = time.time_ns()
+    for author in authors_found:
+        books = list(s.list(Book, author))
+        assert len(books) == BOOKS
+    end = time.time_ns()
+    t3 = end - start
 
-start = time.time()
-authors_found = list(s.list(Author))
-assert AUTHORS == len(authors_found)
-end = time.time()
-t2 = end - start
+    start = time.time_ns()
+    books = list(s.list(Book))
+    assert len(books) == BOOKS*AUTHORS
+    end = time.time_ns()
+    t4 = end - start
 
-start = time.time()
-for author in authors_found:
-    books = list(s.list(Book, author))
-    assert len(books) == BOOKS
-end = time.time()
-t3 = end - start
+    print(f'Storage: {s}')
+    print(f'T1: {t1/1000000:.2f} ms')
+    print(f'T2: {t2/1000000:.2f} ms')
+    print(f'T3: {t3/1000000:.2f} ms')
+    print(f'T4: {t4/1000000:.2f} ms')
 
-start = time.time()
-books = list(s.list(Book))
-assert len(books) == BOOKS*AUTHORS
-end = time.time()
-t4 = end - start
-
-
-print(f'T1: {t1:.2f} sec')
-print(f'T2: {t2:.2f} sec')
-print(f'T3: {t3:.2f} sec')
-print(f'T4: {t4:.2f} sec')
-
-shutil.rmtree(STORAGE)
+    s.destroy()
 
 # path.glob
 # T1: 1.28 sec
@@ -80,3 +81,15 @@ shutil.rmtree(STORAGE)
 # T2: 0.24 sec
 # T3: 1.44 sec
 # T4: 1.25 sec
+
+# SQLite storage is added
+# Storage: file.Storage(base_path=benchmark.storage)
+# T1: 651.90 ms
+# T2: 266.05 ms
+# T3: 1428.29 ms
+# T4: 1234.20 ms
+# Storage: sqlite.Storage(base_path=benchmark.db)
+# T1: 19.98 ms
+# T2: 0.00 ms
+# T3: 7.00 ms
+# T4: 1.00 ms
