@@ -1,6 +1,6 @@
 # Python Object Storage 
 
-Simple JSON file storage for Python dataclasses and Pydantic models, thread and multiprocess safe. 
+Simple fast JSON file storage for Python dataclasses and Pydantic models, thread and multiprocess safe. 
 
 ----
 
@@ -119,8 +119,11 @@ assert for_kids in leo_books
 ```python
 import pys
 
-# Initialize storage
-storage = pys.storage('.path-to-storage')
+# Initialize default (file) storage
+storage1 = pys.storage('.path-to-storage')
+
+# Initialize SQLite storage
+storage2 = pys.sqlite_storage('path-to-storage.db')
 
 # Save a model with optional relation to other models
 storage.save(model, [related_model | (RelatedModelClass, related_model_id), ...])
@@ -133,9 +136,16 @@ storage.delete(ModelClass, model_id, [related_model | (RelatedModelClass, relate
 
 # List models by specified ModelClass with optional relation to other models
 storage.list(ModelClass, [related_model | (RelatedModelClass, related_model_id), ...])
+
+# Destroy storage
+storage.destroy()
 ```
 
 ## Release Notes
+
+### 0.0.4
+SQLite storage is added.
+Support of `msqspec` JSON and structures is added.
 
 ### 0.0.3
 Benchmark is added, performance is improved.

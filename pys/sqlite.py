@@ -93,13 +93,15 @@ class Storage(BaseStorage):
              prev_id,
              prev_cls.__name__ if prev else None,),
         )
-        return self.con.total_changes
+        return model.__my_id__()
 
     def save(self, model: StoredModel, *related_model: Related) -> Any:
         prev_model = None
+        last_id = None
         for m in related_model + (model,):
-            self._save(m, prev=prev_model)
+            last_id = self._save(m, prev=prev_model)
             prev_model = m
+        return last_id
 
     def delete(self, model_class: Type[StoredModel], model_id: str, *related_model: Related) -> None:
         last_related = related_model[-1] if related_model else None

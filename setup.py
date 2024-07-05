@@ -8,7 +8,7 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setup(name='pysdato',
-      version='0.0.3',
+      version='0.0.4',
       description='Simple JSON file storage for Python dataclasses and pydantic models, thread and multiprocess safe',
       long_description=README,
       long_description_content_type="text/markdown",
