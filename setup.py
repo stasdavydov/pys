@@ -32,5 +32,6 @@ setup(name='pysdato',
       install_requires=[
           'filelock==3.15.4',
           'json-fix',
+          'msgspec',
       ],
       )

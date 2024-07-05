@@ -1,19 +1,18 @@
 import shutil
 import time
-from dataclasses import dataclass
+
+import msgspec
 
 import pys
 
 
 @pys.saveable(field_as_id='name')
-@dataclass
-class Author:
+class Author(msgspec.Struct):
     name: str
 
 
 @pys.saveable(field_as_id='title')
-@dataclass
-class Book:
+class Book(msgspec.Struct):
     author_id: str
     title: str
 
@@ -22,6 +21,7 @@ AUTHORS = 100
 BOOKS = 5
 
 STORAGE = '.benchmark'
+shutil.rmtree(STORAGE, ignore_errors=True)
 s = pys.storage(STORAGE)
 
 start = time.time()
@@ -71,6 +71,12 @@ shutil.rmtree(STORAGE)
 #
 # os.listdir
 # T1: 0.68 sec
+# T2: 0.24 sec
+# T3: 1.44 sec
+# T4: 1.25 sec
+
+# msgspec
+# T1: 0.62 sec
 # T2: 0.24 sec
 # T3: 1.44 sec
 # T4: 1.25 sec

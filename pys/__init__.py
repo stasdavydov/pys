@@ -1,5 +1,4 @@
 import abc
-import json
 import os
 import shutil
 import uuid
@@ -7,32 +6,34 @@ from dataclasses import is_dataclass, asdict
 from pathlib import Path
 from typing import Type, Optional, Tuple, Iterable, Any, Union
 from typing import TypeVar
+
+import msgspec
 from filelock import FileLock
 
 
 def saveable(cls=None, /, field_as_id: str = 'id'):
     def wrapper(cls):
         def my_id_or_default(self):
-            __default_id__ = '__default_id__'
             if hasattr(self, field_as_id):
                 if getattr(self, field_as_id, None) is None:
                     setattr(self, field_as_id, str(uuid.uuid4()))
                 return getattr(self, field_as_id)
-            elif hasattr(self, '__loaded_id__'):
-                setattr(self, __default_id__, getattr(self, '__loaded_id__'))
-            elif getattr(self, __default_id__, None) is None:
-                setattr(self, __default_id__, str(uuid.uuid4()))
-            return getattr(self, __default_id__)
+            else:
+                return str(id(self))
 
         setattr(cls, '__my_id__', my_id_or_default)
         if not hasattr(cls, '__json__'):
-            if is_dataclass(cls):
+            if issubclass(cls, msgspec.Struct):
                 setattr(cls, '__json__',
                         lambda self:
-                            json.dumps(
+                            msgspec.json.encode(self).decode(encoding='UTF-8')
+                        )
+            elif is_dataclass(cls):
+                setattr(cls, '__json__',
+                        lambda self:
+                            msgspec.json.encode(
                                 asdict(self),
-                                separators=(',', ':')
-                            )
+                            ).decode(encoding='UTF-8')
                         )
             elif is_pydantic(cls):
                 setattr(cls, '__json__', lambda self: self.model_dump_json())
@@ -158,12 +159,11 @@ class FileStorage(BaseStorage):
             if not path.exists():
                 return None
             with open(path, 'r') as f:
-                content = json.load(f)
+                content = msgspec.json.decode(f.read())
             if is_pydantic(model_class):
                 model = model_class.model_validate(content)
             else:
                 model = model_class(**content)
-            setattr(model, '__loaded_id__', model_id)
             return model
 
     def delete(self, model_class: Type[StoredModel], model_id: str,
