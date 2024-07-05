@@ -119,11 +119,12 @@ assert for_kids in leo_books
 ```python
 import pys
 
-# Initialize default (file) storage
-storage1 = pys.storage('.path-to-storage')
+# Initialize file storage
+storage = pys.file_storage('.path-to-storage')
 
-# Initialize SQLite storage
-storage2 = pys.sqlite_storage('path-to-storage.db')
+# Initialize SQLite (default) storage
+storage = pys.storage('path-to-storage.db')
+storage = pys.sqlite_storage('path-to-storage.db')
 
 # Save a model with optional relation to other models
 storage.save(model, [related_model | (RelatedModelClass, related_model_id), ...])
@@ -142,6 +143,10 @@ storage.destroy()
 ```
 
 ## Release Notes
+
+### 0.0.5
+Performance is dramatically improved with SQLite storage implementation.
+Default storage is SQLite storage now.
 
 ### 0.0.4
 SQLite storage is added.

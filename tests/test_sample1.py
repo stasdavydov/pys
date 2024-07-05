@@ -8,7 +8,7 @@ from pys.pydantic import ModelWithID
 
 def test_sample_pydantic():
     # Initialize storage with path where files will be saved
-    storage = pys.storage('.storage')
+    storage = pys.storage('storage.db')
 
     class Author(ModelWithID):
         name: str
@@ -25,7 +25,7 @@ def test_sample_pydantic():
 
 def test_sample_dataclass():
     # Initialize storage with path where files will be saved
-    storage = pys.storage('.storage')
+    storage = pys.storage('storage.db')
 
     @pys.saveable
     @dataclass

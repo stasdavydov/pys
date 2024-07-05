@@ -55,6 +55,6 @@ def sqlite_storage(base_path: Union[str, Path]):
     return sqlite.Storage(base_path)
 
 
-storage = file_storage
+storage = sqlite_storage
 
 __all__ = ('saveable', 'storage', 'file_storage', 'sqlite_storage')

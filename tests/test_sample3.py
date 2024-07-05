@@ -1,5 +1,3 @@
-import shutil
-
 import pytest
 from pydantic import BaseModel
 
@@ -20,14 +18,11 @@ class Book(BaseModel):
 
 @pytest.fixture
 def storage():
-    shutil.rmtree('.storage')
-    storage = pys.storage('.storage')
+    storage = pys.storage('storage.db')
     return storage
 
 
 def test_sample(storage):
-    storage = pys.storage('.storage')
-
     # A few books of Leo Tolstoy
     leo = Author(name='Leo Tolstoy')
     war_and_peace = Book(title='War and peace')

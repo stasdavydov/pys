@@ -14,7 +14,7 @@ def test_sample_pydantic2():
     class Book(BaseModel):
         title: str
 
-    storage = pys.storage('.storage')
+    storage = pys.storage('storage.db')
 
     # A few books of Leo Tolstoy
     leo = Author(name='Leo Tolstoy')
