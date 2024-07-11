@@ -130,6 +130,5 @@ def test_list(storage):
     storage.delete(bot_owner.__class__, bot_owner.id)
 
 
-def test_tear_down():
-    for s in storages:
-        s.destroy()
+def test_tear_down(storage):
+    storage.destroy()
