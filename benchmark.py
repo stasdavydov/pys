@@ -83,13 +83,12 @@ for s in storages:
 # T4: 1.25 sec
 
 # SQLite storage is added
-# Storage: file.Storage(base_path=benchmark.storage)
-# T1: 651.90 ms
-# T2: 266.05 ms
-# T3: 1428.29 ms
-# T4: 1234.20 ms
+# T1: 656.80 ms
+# T2: 264.35 ms
+# T3: 1368.96 ms
+# T4: 1182.48 ms
 # Storage: sqlite.Storage(base_path=benchmark.db)
-# T1: 19.98 ms
-# T2: 0.00 ms
-# T3: 7.00 ms
+# T1: 20.00 ms
+# T2: 1.00 ms
+# T3: 6.51 ms
 # T4: 1.00 ms

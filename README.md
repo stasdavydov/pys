@@ -3,6 +3,10 @@
 Simple fast JSON file storage for Python dataclasses and Pydantic models, thread and multiprocess safe. 
 
 ----
+It's standard to use SQL or NoSQL database servers as data backend, but sometimes it's more
+convenient to have data persisted as file(s) locally on backend application side. If you still
+need to use SQL for data retrieval the best option is SQLite, but for simple REST APIs it 
+could be better to work with objects as is. So here we go.
 
 ## Installation
 ```shell
@@ -10,7 +14,7 @@ pip install pysdato
 ```
 
 ## Usage
-The library is intended to store Python dataclasses or Pydantic models as JSON-files referenced by ID 
+The library is intended to store Python `dataclasses`, `msqspec.Struct` or Pydantic models as JSON-files referenced by ID 
 and supports object hierarchy. 
 
 Let's say we have `Author` model. Object's ID is key point for persistence -- it will be used as name of
@@ -23,7 +27,7 @@ from dataclasses import dataclass
 import pys
 
 # Initialize storage with path where files will be saved
-storage = pys.storage('.storage')
+storage = pys.storage('storage.db')
 
 @pys.saveable
 @dataclass
@@ -59,7 +63,7 @@ class Author(BaseModel):
 class Book(BaseModel):
     title: str
 
-storage = pys.storage('.storage')
+storage = pys.storage('storage.db')
 
 # A few books of Leo Tolstoy
 leo = Author(name='Leo Tolstoy')
@@ -98,7 +102,7 @@ class Author(BaseModel):
 class Book(BaseModel):
     title: str
 
-storage = pys.storage('.storage')
+storage = pys.storage('storage.db')
 
 # A few books of Leo Tolstoy
 leo = Author(name='Leo Tolstoy')
@@ -115,7 +119,14 @@ assert war_and_peace in leo_books
 assert for_kids in leo_books
 ```
 
-## Reference
+## Storages
+Library supports two storages implementation: 
+- `sqlite_storage()` - SQLite based -- really fast, uses one file for all objects.
+- `file_storage()` - JSON file per object storage, it is slower, but saves each object in a separate JSON file.
+
+The default storage is SQLite based.
+
+## Library Reference
 ```python
 import pys
 
@@ -144,20 +155,12 @@ storage.destroy()
 
 ## Release Notes
 
-### 0.0.5
-Performance is dramatically improved with SQLite storage implementation.
+- **0.0.6** `saveable` decorator reworked, added `default_id` parameter that can be used for
+changing ID generation behaviour. By default, we use `str(id(self))` as ID (and `str(uuid.uuid4())`
+for `pys.pydantic.ModelWithID`), but it can be changed now.
+- **0.0.5** Performance is dramatically improved with SQLite storage implementation. 
 Default storage is SQLite storage now.
-
-### 0.0.4
-SQLite storage is added.
-Support of `msqspec` JSON and structures is added.
-
-### 0.0.3
-Benchmark is added, performance is improved.
-Fixed dependency set up.
-
-### 0.0.2
-Added support for Python 3.x < 3.10
-
-### 0.0.1 
-Initial public release
+- **0.0.4** SQLite storage is added. Support of `msqspec` JSON and structures is added.
+- **0.0.3** Benchmark is added, performance is improved. Fixed dependency set up.
+- **0.0.2** Added support for Python 3.x < 3.10
+- **0.0.1** Initial public release
