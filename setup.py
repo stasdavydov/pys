@@ -1,7 +1,8 @@
 import pathlib
-from distutils.core import setup
 
 # The directory containing this file
+from setuptools import setup
+
 HERE = pathlib.Path(__file__).parent
 
 # The text of the README file

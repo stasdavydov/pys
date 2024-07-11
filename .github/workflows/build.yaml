@@ -20,6 +20,7 @@ jobs:
         python-version: ${{ matrix.python_version }}
     - name: Instal dependency and test environment
       run: |
-        pip install -e [test]
+        pip install pydantic pytest
+        python setup.py build install
     - name: Run tests
       run: pytest tests
