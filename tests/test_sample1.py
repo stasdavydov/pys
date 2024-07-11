@@ -9,7 +9,7 @@ from pys.pydantic import ModelWithID
 
 @pytest.fixture
 def storage():
-    storage = pys.storage('storage.db')
+    storage = pys.file_storage('storage.db')
     yield storage
     storage.destroy()
 

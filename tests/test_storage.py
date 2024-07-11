@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import Any, Optional
 
@@ -55,13 +56,16 @@ storages = [
 
 @pytest.fixture(params=storages)
 def storage(request):
-    s = request.param
-    yield s
+    return request.param
 
 
 def test_load(storage):
     owner = BotOwner(username='itisme', first_name='Test', last_name='Tester')
+    assert owner.id is None
+    owner.__my_id__()
+    assert str(uuid.UUID(owner.id, version=4))
     storage.save(owner)
+
     bot_owner = storage.load(BotOwner, owner.id)
     assert bot_owner is not None
     assert bot_owner.id == owner.id

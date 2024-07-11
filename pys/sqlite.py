@@ -1,6 +1,7 @@
 import os
 import re
 import sqlite3
+from pathlib import Path
 from typing import Type, Iterable, Optional, Any
 
 import msgspec
@@ -34,8 +35,8 @@ class Storage(BaseStorage):
     def _get_table_name(cls):
         return re.sub(r'\W', '_', cls.__name__).lower()
 
-    def __init__(self, path):
-        self.base_path = path
+    def __init__(self, path: Path):
+        self.base_path = Path(path)
         self.con = sqlite3.connect(self.base_path)
 
     @staticmethod
@@ -136,7 +137,8 @@ class Storage(BaseStorage):
 
     def destroy(self) -> None:
         self.con.close()
-        os.unlink(self.base_path)
+        if self.base_path.exists():
+            os.unlink(self.base_path)
 
     def __str__(self) -> str:
         return f'sqlite.Storage(base_path={self.base_path})'

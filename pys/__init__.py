@@ -1,4 +1,5 @@
 import functools
+import uuid
 from dataclasses import asdict
 from pathlib import Path
 from typing import Union, Callable, Any
@@ -12,9 +13,13 @@ def _msgspec_json(d: dict) -> str:
     return msgspec.json.encode(d).decode(encoding='UTF-8')
 
 
+def _random_uuid(_) -> str:
+    return str(uuid.uuid4())
+
+
 def saveable(cls=None, *,
              field_as_id: str = 'id',
-             default_id: Callable[[Any], str] = lambda self: str(id(self))):
+             default_id: Callable[[Any], str] = _random_uuid):
     """
     Decorate the given `cls` with `__my_id__()` and `__json__()` methods
     required for persistence.

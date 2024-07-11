@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from . import saveable
 
 
-@saveable(field_as_id='id', default_id=lambda _: str(uuid.uuid4()))
+@saveable(field_as_id='id')
 class ModelWithID(BaseModel):
     """
     Base class for models with `id` field prefilled with random UUID if not initialized.

@@ -176,8 +176,7 @@ T4: 2.00 ms -- list 500 objects -- 0.004 ms per object
 ## Release Notes
 
 - **0.0.6** `saveable` decorator reworked, added `default_id` parameter that can be used for
-changing ID generation behaviour. By default, we use `str(id(self))` as ID (and `str(uuid.uuid4())`
-for `pys.pydantic.ModelWithID`), but it can be changed now.
+changing ID generation behaviour. By default, we use `str(uuid.uuid4())` as ID.
 - **0.0.5** Performance is dramatically improved with SQLite storage implementation. 
 Default storage is SQLite storage now.
 - **0.0.4** SQLite storage is added. Support of `msqspec` JSON and structures is added.
