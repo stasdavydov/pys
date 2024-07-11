@@ -1,15 +1,20 @@
 from dataclasses import dataclass
 
 import msgspec
+import pytest
 
 import pys
 from pys.pydantic import ModelWithID
 
 
-def test_sample_pydantic():
-    # Initialize storage with path where files will be saved
+@pytest.fixture
+def storage():
     storage = pys.storage('storage.db')
+    yield storage
+    storage.destroy()
 
+
+def test_sample_pydantic(storage):
     class Author(ModelWithID):
         name: str
 
@@ -23,10 +28,7 @@ def test_sample_pydantic():
     assert another_leo.name == leo.name
 
 
-def test_sample_dataclass():
-    # Initialize storage with path where files will be saved
-    storage = pys.storage('storage.db')
-
+def test_sample_dataclass(storage):
     @pys.saveable
     @dataclass
     class Author:
@@ -42,10 +44,7 @@ def test_sample_dataclass():
     assert another_leo.name == leo.name
 
 
-def test_sample_msgspec():
-    # Initialize storage with path where files will be saved
-    storage = pys.sqlite_storage('storage.db')
-
+def test_sample_msgspec(storage):
     @pys.saveable
     class Author(msgspec.Struct):
         id: str

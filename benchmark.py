@@ -36,12 +36,14 @@ for s in storages:
             s.save(book)
     end = time.time_ns()
     t1 = end - start
+    total1 = AUTHORS + AUTHORS * BOOKS * 2
 
     start = time.time_ns()
     authors_found = list(s.list(Author))
     assert AUTHORS == len(authors_found)
     end = time.time_ns()
     t2 = end - start
+    total2 = AUTHORS
 
     start = time.time_ns()
     for author in authors_found:
@@ -49,18 +51,22 @@ for s in storages:
         assert len(books) == BOOKS
     end = time.time_ns()
     t3 = end - start
+    total3 = len(authors_found) * BOOKS
 
     start = time.time_ns()
     books = list(s.list(Book))
     assert len(books) == BOOKS*AUTHORS
     end = time.time_ns()
     t4 = end - start
+    total4 = len(books)
+
+    NS_IN_MS = 1_000_000
 
     print(f'Storage: {s}')
-    print(f'T1: {t1/1000000:.2f} ms')
-    print(f'T2: {t2/1000000:.2f} ms')
-    print(f'T3: {t3/1000000:.2f} ms')
-    print(f'T4: {t4/1000000:.2f} ms')
+    print(f'T1: {t1/NS_IN_MS:.2f} ms -- save {total1} objects -- {t1/NS_IN_MS/total1:.3f} ms per object')
+    # print(f'T2: {t2/NS_IN_MS:.2f} ms -- list {total2} objects -- {t2/1000000/total2:.6f} mks per object')
+    print(f'T3: {t3/NS_IN_MS:.2f} ms -- list {total3} objects -- {t3/NS_IN_MS/total3:.3f} ms per object')
+    print(f'T4: {t4/NS_IN_MS:.2f} ms -- list {total4} objects -- {t4/NS_IN_MS/total4:.3f} ms per object')
 
     s.destroy()
 

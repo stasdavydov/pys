@@ -19,7 +19,8 @@ class Book(BaseModel):
 @pytest.fixture
 def storage():
     storage = pys.storage('storage.db')
-    return storage
+    yield storage
+    storage.destroy()
 
 
 def test_sample(storage):

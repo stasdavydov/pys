@@ -6,8 +6,25 @@ RelatedModel = TypeVar('RelatedModel')
 Related = Union[RelatedModel, Tuple[RelatedModel, str]]
 
 
+def is_dataclass(cls):
+    import dataclasses
+    return dataclasses.is_dataclass(cls)
+
+
 def is_pydantic(cls):
-    return any(filter(lambda c: c.__name__ == 'BaseModel', cls.__mro__))
+    try:
+        from pydantic import BaseModel
+        return issubclass(cls, BaseModel)
+    except Exception as e:
+        return False
+
+
+def is_msgspec_struct(cls):
+    try:
+        import msgspec
+        return issubclass(cls, msgspec.Struct)
+    except:
+        return False
 
 
 class BaseStorage(abc.ABC):

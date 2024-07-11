@@ -1,12 +1,15 @@
 import functools
-from dataclasses import is_dataclass, asdict
+from dataclasses import asdict
 from pathlib import Path
 from typing import Union, Callable, Any
 
-import msgspec
-
-from .base import is_pydantic
+from .base import is_pydantic, is_dataclass, is_msgspec_struct
 from . import file, sqlite
+
+
+def _msgspec_json(d: dict) -> str:
+    import msgspec
+    return msgspec.json.encode(d).decode(encoding='UTF-8')
 
 
 def saveable(cls=None, *,
@@ -44,10 +47,11 @@ def saveable(cls=None, *,
                 Get JSON representation of the object
                 :return: JSON representation
                 """
-                if issubclass(cls, msgspec.Struct):
-                    return msgspec.json.encode(self).decode(encoding='UTF-8')
+                if is_msgspec_struct(cls):
+                    return _msgspec_json(self)
                 elif is_dataclass(cls):
-                    return msgspec.json.encode(asdict(self)).decode(encoding='UTF-8')
+                    # noinspection PyDataclass
+                    return _msgspec_json(asdict(self))
                 elif is_pydantic(cls):
                     return self.model_dump_json()
                 elif hasattr(cls, '__json__'):

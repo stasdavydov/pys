@@ -1,9 +1,17 @@
+import pytest
 from pydantic import BaseModel
 
 import pys
 
 
-def test_sample_pydantic2():
+@pytest.fixture
+def storage():
+    storage = pys.storage('storage.db')
+    yield storage
+    storage.destroy()
+
+
+def test_sample_pydantic2(storage):
     # An author
     @pys.saveable
     class Author(BaseModel):
@@ -13,8 +21,6 @@ def test_sample_pydantic2():
     @pys.saveable
     class Book(BaseModel):
         title: str
-
-    storage = pys.storage('storage.db')
 
     # A few books of Leo Tolstoy
     leo = Author(name='Leo Tolstoy')

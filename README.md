@@ -13,6 +13,12 @@ could be better to work with objects as is. So here we go.
 pip install pysdato
 ```
 
+If you plan to use it with `pydantic`:
+```shell
+pip install pysdato[pydantic]
+```
+
+
 ## Usage
 The library is intended to store Python `dataclasses`, `msqspec.Struct` or Pydantic models as JSON-files referenced by ID 
 and supports object hierarchy. 
@@ -151,6 +157,20 @@ storage.list(ModelClass, [related_model | (RelatedModelClass, related_model_id),
 
 # Destroy storage
 storage.destroy()
+```
+
+## Benchmark
+You can find the benchmark code in `benchmark.py` file.
+
+```
+Storage: file.Storage(base_path=benchmark.storage)
+T1: 691.24 ms -- save 1100 objects -- 0.628 ms per object
+T3: 1458.94 ms -- list 500 objects -- 2.918 ms per object
+T4: 1208.28 ms -- list 500 objects -- 2.417 ms per object
+Storage: sqlite.Storage(base_path=benchmark.db)
+T1: 19.51 ms -- save 1100 objects -- 0.018 ms per object
+T3: 7.00 ms -- list 500 objects -- 0.014 ms per object
+T4: 2.00 ms -- list 500 objects -- 0.004 ms per object
 ```
 
 ## Release Notes

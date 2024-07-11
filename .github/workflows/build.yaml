@@ -8,15 +8,18 @@ jobs:
     name: Build and run tests
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: ${{ matrix.python_version }}
     - name: Instal dependency and test environment
       run: |
-        pip install -r requirements.txt
-        pip install pydantic pytest
+        pip install -e [test]
     - name: Run tests
       run: pytest tests
