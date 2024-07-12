@@ -37,7 +37,7 @@ def saveable(cls=None, *,
             if not hasattr(cls, field_as_id):
                 if is_msgspec_struct(cls):
                     import msgspec
-                    __my_saved_id__: str | None | msgspec.UnsetType = msgspec.UNSET
+                    __my_saved_id__: Union[str, None, msgspec.UnsetType] = msgspec.UNSET
                 else:
                     __slots__ = (MY_SAVED_ID,)
 
