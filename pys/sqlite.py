@@ -4,9 +4,7 @@ import sqlite3
 from pathlib import Path
 from typing import Type, Iterable, Optional, Any
 
-import msgspec
-
-from .base import BaseStorage, StoredModel, Related, is_pydantic
+from .base import BaseStorage, StoredModel, Related
 
 
 class Storage(BaseStorage):
@@ -49,15 +47,6 @@ class Storage(BaseStorage):
                 (prev_cls, prev_id) = related_model.__class__, related_model.__my_id__()
         return prev_cls, prev_id
 
-    @staticmethod
-    def _load(model_class: Type[StoredModel], raw_contet):
-        content = msgspec.json.decode(raw_contet)
-        if is_pydantic(model_class):
-            model = model_class.model_validate(content)
-        else:
-            model = model_class(**content)
-        return model
-
     def load(self, model_class: Type[StoredModel], model_id: str, *related_model: Related) -> Optional[StoredModel]:
         last_related = related_model[-1] if related_model else None
         (rel_cls, rel_id) = self._related(last_related)
@@ -74,7 +63,7 @@ class Storage(BaseStorage):
             """,
             (model_id, rel_id, rel_cls.__name__) if last_related else (model_id,),
         ):
-            return self._load(model_class, row[1])
+            return self._load(model_class, row[1], row[0])
         else:
             return None
 
@@ -126,7 +115,7 @@ class Storage(BaseStorage):
         table_name = self._get_table_name(model_class)
         self._ensure_table_exist(table_name)
 
-        return [self._load(model_class, row[1]) for row in self.con.execute(
+        return [self._load(model_class, row[1], row[0]) for row in self.con.execute(
             f"""
             select distinct id, data, related_id, related_name
             from {table_name}

@@ -4,8 +4,8 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Union, Callable, Any
 
-from .base import is_pydantic, is_dataclass, is_msgspec_struct
 from . import file, sqlite
+from .base import is_pydantic, is_dataclass, is_msgspec_struct
 
 
 def _msgspec_json(d: dict) -> str:
@@ -15,6 +15,9 @@ def _msgspec_json(d: dict) -> str:
 
 def _random_uuid(_) -> str:
     return str(uuid.uuid4())
+
+
+MY_SAVED_ID = '__my_saved_id__'
 
 
 def saveable(cls=None, *,
@@ -31,6 +34,13 @@ def saveable(cls=None, *,
     if cls:
         @functools.wraps(cls, updated=())
         class _Persisted(cls):
+            if not hasattr(cls, field_as_id):
+                if is_msgspec_struct(cls):
+                    import msgspec
+                    __my_saved_id__: str | None | msgspec.UnsetType = msgspec.UNSET
+                else:
+                    __slots__ = (MY_SAVED_ID,)
+
             def __my_id__(self):
                 """
                 Get object ID to be used for persisting. If `field_as_id` is specified
@@ -39,10 +49,14 @@ def saveable(cls=None, *,
                 """
                 if field_as_id and hasattr(self, field_as_id):
                     if not getattr(self, field_as_id, None):
-                        setattr(self, field_as_id, default_id(self))
+                        _id = default_id(self)
+                        setattr(self, field_as_id, _id)
                     _id = getattr(self, field_as_id)
                 else:
-                    _id = default_id(self)
+                    if not getattr(self, MY_SAVED_ID, None):
+                        _id = default_id(self)
+                        setattr(self, MY_SAVED_ID, _id)
+                    _id = getattr(self, MY_SAVED_ID)
                 if not _id:
                     raise ValueError('ID shall not be empty')
                 return _id
@@ -53,7 +67,16 @@ def saveable(cls=None, *,
                 :return: JSON representation
                 """
                 if is_msgspec_struct(cls):
-                    return _msgspec_json(self)
+                    import msgspec
+                    copy = None
+                    if hasattr(self, MY_SAVED_ID):
+                        copy = self.__my_saved_id__
+                        self.__my_saved_id__ = msgspec.UNSET
+                    try:
+                        return _msgspec_json(self)
+                    finally:
+                        if hasattr(self, MY_SAVED_ID):
+                            self.__my_saved_id__ = copy
                 elif is_dataclass(cls):
                     # noinspection PyDataclass
                     return _msgspec_json(asdict(self))

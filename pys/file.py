@@ -3,10 +3,9 @@ import shutil
 from pathlib import Path
 from typing import Type, Optional, Tuple, Iterable, Any, Union
 
-import msgspec
 from filelock import FileLock
 
-from .base import BaseStorage, StoredModel, RelatedModel, Related, is_pydantic
+from .base import BaseStorage, StoredModel, RelatedModel, Related
 
 
 class Storage(BaseStorage):
@@ -49,9 +48,8 @@ class Storage(BaseStorage):
         model_id = model.__my_id__()
         path, lock = self._prepare_file(model.__class__, model_id, *related_model)
         with lock:
-            with path.open('w', encoding='UTF-8') as f:
-                f.write(model.__json__())
-                return model_id
+            path.write_text(model.__json__())
+            return model_id
 
     def load(self, model_class: Type[StoredModel], model_id: str,
              *related_model: Related) -> Optional[StoredModel]:
@@ -59,13 +57,7 @@ class Storage(BaseStorage):
         with lock:
             if not path.exists():
                 return None
-            with open(path, 'r') as f:
-                content = msgspec.json.decode(f.read())
-            if is_pydantic(model_class):
-                model = model_class.model_validate(content)
-            else:
-                model = model_class(**content)
-            return model
+            return self._load(model_class, path.read_text(), model_id)
 
     def delete(self, model_class: Type[StoredModel], model_id: str,
                *related_model: Related) -> None:
@@ -91,4 +83,3 @@ class Storage(BaseStorage):
 
     def destroy(self) -> None:
         shutil.rmtree(self.base_path)
-

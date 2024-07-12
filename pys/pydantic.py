@@ -1,5 +1,3 @@
-import uuid
-
 from pydantic import BaseModel
 
 from . import saveable
