@@ -21,7 +21,7 @@ jobs:
     - name: Instal dependency and test environment
       run: |
         python -m pip install -U pip setuptools
-        pip install pydantic pytest
+        pip install msgspec pydantic pytest
         python setup.py build install
     - name: Run tests
       run: pytest tests
