@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 import msgspec
 import pytest
@@ -135,9 +136,49 @@ def models_with_id() -> list[tuple]:
     ]
 
 
+def custom_cases() -> list[tuple]:
+    @pys.saveable(field_as_id='name')
+    class CustomAuthor(pys.Persistent):
+        name: str
+
+        def __init__(self, name):
+            self.name = name
+
+        @classmethod
+        def __factory__(cls, raw_content: str, model_id: Any) -> 'CustomAuthor':
+            return CustomAuthor(raw_content)
+
+        def __json__(self) -> str:
+            return self.name
+
+        def __eq__(self, o: object) -> bool:
+            return self.name == o.name
+
+    @pys.saveable(field_as_id='title')
+    class CustomBook(pys.Persistent):
+        title: str
+
+        def __init__(self, title):
+            self.title = title
+
+        @classmethod
+        def __factory__(cls, raw_content: str, model_id: Any) -> 'CustomBook':
+            return CustomBook(raw_content)
+
+        def __json__(self) -> str:
+            return self.title
+
+        def __eq__(self, o: object) -> bool:
+            return self.title == o.title
+
+    return [
+        (CustomAuthor, CustomBook),
+    ]
+
+
 @pytest.mark.parametrize(
     argnames=('cls_author', 'cls_book'),
-    argvalues=dataclass_cases() + msgspec_structs() + pydantic_models() + models_with_id()
+    argvalues=dataclass_cases() + msgspec_structs() + pydantic_models() + models_with_id() + custom_cases()
 )
 def test_sample(storage, cls_author, cls_book):
     leo = cls_author(name='Leo Tolstoy')

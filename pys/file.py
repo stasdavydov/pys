@@ -57,7 +57,7 @@ class Storage(BaseStorage):
         with lock:
             if not path.exists():
                 return None
-            return self._load(model_class, path.read_text(), model_id)
+            return model_class.__factory__(path.read_text(), model_id)
 
     def delete(self, model_class: Type[StoredModel], model_id: str,
                *related_model: Related) -> None:

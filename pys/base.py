@@ -1,32 +1,9 @@
 import abc
 from typing import TypeVar, Union, Tuple, Type, Optional, Any, Iterable
 
-import msgspec
-
 StoredModel = TypeVar('StoredModel')
 RelatedModel = TypeVar('RelatedModel')
 Related = Union[RelatedModel, Tuple[RelatedModel, str]]
-
-
-def is_dataclass(cls):
-    import dataclasses
-    return dataclasses.is_dataclass(cls)
-
-
-def is_pydantic(cls):
-    try:
-        from pydantic import BaseModel
-        return issubclass(cls, BaseModel)
-    except Exception as e:
-        return False
-
-
-def is_msgspec_struct(cls):
-    try:
-        import msgspec
-        return issubclass(cls, msgspec.Struct)
-    except:
-        return False
 
 
 class BaseStorage(abc.ABC):
@@ -83,14 +60,3 @@ class BaseStorage(abc.ABC):
         Destroy storage
         """
         raise NotImplementedError
-
-    @staticmethod
-    def _load(model_class: Type[StoredModel], raw_content, model_id):
-        content = msgspec.json.decode(raw_content)
-        if is_pydantic(model_class):
-            model = model_class.model_validate(content)
-        else:
-            model = model_class(**content)
-            if hasattr(model, '__my_saved_id__'):
-                model.__my_saved_id__ = model_id
-        return model

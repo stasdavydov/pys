@@ -63,7 +63,7 @@ class Storage(BaseStorage):
             """,
             (model_id, rel_id, rel_cls.__name__) if last_related else (model_id,),
         ):
-            return self._load(model_class, row[1], row[0])
+            return model_class.__factory__(row[1], row[0])
         else:
             return None
 
@@ -115,7 +115,7 @@ class Storage(BaseStorage):
         table_name = self._get_table_name(model_class)
         self._ensure_table_exist(table_name)
 
-        return [self._load(model_class, row[1], row[0]) for row in self.con.execute(
+        return [model_class.__factory__(row[1], row[0]) for row in self.con.execute(
             f"""
             select distinct id, data, related_id, related_name
             from {table_name}

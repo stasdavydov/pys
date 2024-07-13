@@ -18,6 +18,16 @@ If you plan to use it with `pydantic`:
 pip install pysdato[pydantic]
 ```
 
+To use with dataclasses:
+```shell
+pip install pysdato[dataclass]
+```
+
+To use with `msgspec`:
+```shell
+pip install pysdato[msgspec]
+```
+
 
 ## Usage
 The library is intended to store Python `dataclasses`, `msqspec.Struct` or Pydantic models as JSON-files referenced by ID 
@@ -165,17 +175,18 @@ You can find the benchmark code in `benchmark.py` file.
 
 ```
 Storage: file.Storage(base_path=benchmark.storage)
-T1: 664.01 ms -- save 1100 objects -- 0.604 ms per object
-T3: 1700.65 ms -- list 500 objects -- 3.401 ms per object
-T4: 1324.97 ms -- list 500 objects -- 2.650 ms per object
+T1: 679.41 ms -- save 1100 objects -- 0.618 ms per object
+T3: 1657.14 ms -- list 500 objects -- 3.314 ms per object
+T4: 1284.38 ms -- list 500 objects -- 2.569 ms per object
 Storage: sqlite.Storage(base_path=benchmark.db)
-T1: 19.00 ms -- save 1100 objects -- 0.017 ms per object
-T3: 20.71 ms -- list 500 objects -- 0.041 ms per object
-T4: 16.55 ms -- list 500 objects -- 0.033 ms per object
+T1: 18.52 ms -- save 1100 objects -- 0.017 ms per object
+T3: 6.00 ms -- list 500 objects -- 0.012 ms per object
+T4: 1.00 ms -- list 500 objects -- 0.002 ms per object
 ```
 
 ## Release Notes
-
+- **0.0.9** improved performance, generic `Persistent` base class is provided for custom implementations,
+  allowed installing specifically for pydantic, dataclasses or msgspec usage.
 - **0.0.8** unit-test covers more cases now. Object's actual ID can be used even if it's not defined. 
   Documentation is updated. 
 - **0.0.7** build and test for different Python versions.
