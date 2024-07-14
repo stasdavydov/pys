@@ -2,6 +2,10 @@
 
 Simple fast JSON file storage for Python dataclasses and Pydantic models, thread and multiprocess safe. 
 
+[![PyPI](https://img.shields.io/pypi/v/pysdato)](https://pypi.org/project/pysdato/)
+[![Supported Python
+versions](https://img.shields.io/pypi/pyversions/pysdato.svg)](https://pypi.org/project/pysdato/)
+
 ----
 It's standard to use SQL or NoSQL database servers as data backend, but sometimes it's more
 convenient to have data persisted as file(s) locally on backend application side. If you still
