@@ -89,12 +89,19 @@ def saveable(base_cls=None, *,
                 raise ValueError('ID shall not be empty')
             return _id
 
+        def _original_id(self) -> Union[Any, None]:
+            if hasattr(base_cls, '__my_id__') and callable(cls_my_id := getattr(base_cls, '__my_id__')):
+                return cls_my_id(self)
+            return None
+
         def __my_id__(self) -> Any:
             """
             Get object ID to be used for persisting. If `field_as_id` is specified
             then use this field as ID.
             :return: Object's ID
             """
+            if original_id := self._original_id():
+                return original_id
             _id = getattr(self, field_as_id, None)
             if not _id:
                 _id = default_id(self)
@@ -113,6 +120,10 @@ def saveable(base_cls=None, *,
                     f'The class {base_cls} is not msgspec.Struct, @dataclass nor Pydantic Model '
                     f'and does not have __json__() method. Please implement __json__() method by yourself.')
 
+    class _HasMyIdMethod(_BasePersistence):
+        def __my_id__(self) -> str:
+            return self._original_id()
+
     class _NoIdField(_BasePersistence):
         @classmethod
         def _parent_factory(cls) -> Callable[[str, Any], _BasePersistence]:
@@ -128,17 +139,21 @@ def saveable(base_cls=None, *,
             return model
 
         def __my_id__(self) -> str:
+            if original_id := self._original_id():
+                return original_id
             if not self.__my_saved_id__:
                 self.set_saved_id(default_id(self))
             return self._valid_id(self.__my_saved_id__)
 
     has_id = hasattr(base_cls, field_as_id)
+    has_my_id = hasattr(base_cls, '__my_id__') and callable(getattr(base_cls, '__my_id__'))
+    parent = _HasMyIdMethod if has_my_id else _BasePersistence
 
     if _is_pydantic(base_cls):
         has_id = field_as_id in base_cls.__annotations__
 
         @functools.wraps(base_cls, updated=())
-        class _Pydantic(_BasePersistence):
+        class _Pydantic(parent):
             @classmethod
             def __factory__(cls, raw_content: str, model_id: Any) -> '_Pydantic':
                 return cls.model_validate_json(raw_content)
@@ -155,10 +170,10 @@ def saveable(base_cls=None, *,
             def _parent_factory(cls) -> Callable[[str, Any], _Pydantic]:
                 return _Pydantic.factory
 
-        return _Pydantic if has_id else _PydanticNoId
+        return _Pydantic if has_id or has_my_id else _PydanticNoId
 
     @functools.wraps(base_cls, updated=())
-    class _MsgspecStruct(_BasePersistence):
+    class _MsgspecStruct(parent):
         @classmethod
         def __factory__(cls, raw_content: str, model_id: Any) -> '_MsgspecStruct':
             import msgspec
@@ -203,7 +218,7 @@ def saveable(base_cls=None, *,
                 return super().__json__()
 
     if _is_msgspec_struct(base_cls):
-        return _MsgspecStruct if has_id else _MsgspecStructNoIdField
+        return _MsgspecStruct if has_id or has_my_id else _MsgspecStructNoIdField
 
     if _is_dataclass(base_cls):
         has_id = field_as_id in base_cls.__annotations__
@@ -224,9 +239,9 @@ def saveable(base_cls=None, *,
             def _parent_factory(cls) -> Callable[[str, Any], _Dataclass]:
                 return _Dataclass.factory
 
-        return _Dataclass if has_id else _DataclassNoId
+        return _Dataclass if has_id or has_my_id else _DataclassNoId
 
-    return _BasePersistence
+    return _HasMyIdMethod if has_my_id else _BasePersistence
 
 
 def file_storage(base_path: Union[str, Path]):
