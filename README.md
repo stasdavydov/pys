@@ -189,8 +189,9 @@ T4: 1.00 ms -- list 500 objects -- 0.002 ms per object
 ```
 
 ## Release Notes
-- **0.0.11* Fixed: use own `__my_id__()` function if defined in data class.
-- **0.0.10* Minor changes in documentation.
+- **0.0.12** Fixed: issue with file encoding for custom raw models.
+- **0.0.11** Fixed: use own `__my_id__()` function if defined in data class.
+- **0.0.10** Minor changes in documentation.
 - **0.0.9** improved performance, generic `Persistent` base class is provided for custom implementations,
   allowed installing specifically for pydantic, dataclasses or msgspec usage.
 - **0.0.8** unit-test covers more cases now. Object's actual ID can be used even if it's not defined. 

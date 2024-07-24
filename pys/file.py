@@ -48,7 +48,7 @@ class Storage(BaseStorage):
         model_id = model.__my_id__()
         path, lock = self._prepare_file(model.__class__, model_id, *related_model)
         with lock:
-            path.write_text(model.__json__())
+            path.write_text(model.__json__(), encoding='utf-8')
             return model_id
 
     def load(self, model_class: Type[StoredModel], model_id: str,
@@ -57,7 +57,7 @@ class Storage(BaseStorage):
         with lock:
             if not path.exists():
                 return None
-            return model_class.__factory__(path.read_text(), model_id)
+            return model_class.__factory__(path.read_text(encoding='utf-8'), model_id)
 
     def delete(self, model_class: Type[StoredModel], model_id: str,
                *related_model: Related) -> None:

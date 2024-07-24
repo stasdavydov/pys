@@ -11,7 +11,7 @@ FILELOCK_VERSION = '3.15.4'
 MSGSPEC_VERSION = '0.18.6'
 
 setup(name='pysdato',
-      version='0.0.11',
+      version='0.0.12',
       python_requires='>=3.9',
       description='Simple JSON file storage for Python dataclasses, msgspec structs and pydantic models, thread and '
                   'multiprocess safe',

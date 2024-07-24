@@ -120,10 +120,12 @@ def saveable(base_cls=None, *,
                     f'The class {base_cls} is not msgspec.Struct, @dataclass nor Pydantic Model '
                     f'and does not have __json__() method. Please implement __json__() method by yourself.')
 
+    @functools.wraps(base_cls, updated=())
     class _HasMyIdMethod(_BasePersistence):
         def __my_id__(self) -> str:
             return self._original_id()
 
+    @functools.wraps(base_cls, updated=())
     class _NoIdField(_BasePersistence):
         @classmethod
         def _parent_factory(cls) -> Callable[[str, Any], _BasePersistence]:
