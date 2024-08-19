@@ -47,7 +47,7 @@ class Storage(BaseStorage):
                 (prev_cls, prev_id) = related_model.__class__, related_model.__my_id__()
         return prev_cls, prev_id
 
-    def load(self, model_class: Type[StoredModel], model_id: str, *related_model: Related) -> Optional[StoredModel]:
+    def load(self, model_class: Type[StoredModel], model_id: Any, *related_model: Related) -> Optional[StoredModel]:
         last_related = related_model[-1] if related_model else None
         (rel_cls, rel_id) = self._related(last_related)
 
@@ -93,7 +93,7 @@ class Storage(BaseStorage):
             prev_model = m
         return last_id
 
-    def delete(self, model_class: Type[StoredModel], model_id: str, *related_model: Related) -> None:
+    def delete(self, model_class: Type[StoredModel], model_id: Any, *related_model: Related) -> None:
         last_related = related_model[-1] if related_model else None
         (prev_cls, prev_id) = self._related(last_related)
 
@@ -105,7 +105,7 @@ class Storage(BaseStorage):
             delete from {table_name}
             where id=? and related_id=? and related_name=? 
             """,
-            (model_id, prev_id, prev_cls.__name__ if prev_cls else None,)
+            (str(model_id), prev_id, prev_cls.__name__ if prev_cls else None,)
         )
 
     def list(self, model_class: Type[StoredModel], *related_model: Related) -> Iterable[StoredModel]:

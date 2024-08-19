@@ -3,14 +3,14 @@ from typing import TypeVar, Union, Tuple, Type, Optional, Any, Iterable
 
 StoredModel = TypeVar('StoredModel')
 RelatedModel = TypeVar('RelatedModel')
-Related = Union[RelatedModel, Tuple[RelatedModel, str]]
+Related = Union[RelatedModel, Tuple[RelatedModel, Any]]
 
 
 class BaseStorage(abc.ABC):
     """
     Abstract base storage
     """
-    def load(self, model_class: Type[StoredModel], model_id: str,
+    def load(self, model_class: Type[StoredModel], model_id: Any,
              *related_model: Related) \
             -> Optional[StoredModel]:
         """
@@ -34,7 +34,7 @@ class BaseStorage(abc.ABC):
         """
         raise NotImplementedError
 
-    def delete(self, model_class: Type[StoredModel], model_id: str,
+    def delete(self, model_class: Type[StoredModel], model_id: Any,
                *related_model: Related) -> None:
         """
         Delete model.

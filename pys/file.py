@@ -22,8 +22,8 @@ class Storage(BaseStorage):
         self.base_path = base_path if isinstance(base_path, Path) else Path(base_path)
 
     @staticmethod
-    def _get_model_path(model_class: Type[StoredModel], model_id: str,
-                        *related_model: Union[RelatedModel, Tuple[Type[RelatedModel], str]]) -> Path:
+    def _get_model_path(model_class: Type[StoredModel], model_id: Any,
+                        *related_model: Union[RelatedModel, Tuple[Type[RelatedModel], Any]]) -> Path:
         path = Path()
         if not related_model:
             path /= ''
@@ -34,9 +34,9 @@ class Storage(BaseStorage):
                 else:
                     path /= Storage._get_model_path(model.__class__, model.__my_id__())
 
-        return path / model_class.__name__ / model_id
+        return path / model_class.__name__ / str(model_id)
 
-    def _prepare_file(self, model_class: Type[StoredModel], model_id: str,
+    def _prepare_file(self, model_class: Type[StoredModel], model_id: Any,
                       *related_model: Related):
         path = self.base_path / Storage._get_model_path(model_class, model_id, *related_model).with_suffix('.json')
         lock = path.with_suffix('.lock')
@@ -51,7 +51,7 @@ class Storage(BaseStorage):
             path.write_text(model.__json__(), encoding='utf-8')
             return model_id
 
-    def load(self, model_class: Type[StoredModel], model_id: str,
+    def load(self, model_class: Type[StoredModel], model_id: Any,
              *related_model: Related) -> Optional[StoredModel]:
         path, lock = self._prepare_file(model_class, model_id, *related_model)
         with lock:
