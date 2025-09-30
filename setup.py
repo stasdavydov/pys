@@ -5,10 +5,10 @@ from setuptools import setup
 HERE = pathlib.Path(__file__).parent
 README = (HERE / 'README.md').read_text()
 
-PYTEST_VERSION = '8.22'
-PYDANTIC_VERSION = '2.0'
-FILELOCK_VERSION = '3.15.4'
-MSGSPEC_VERSION = '0.18.6'
+PYTEST_VERSION = '8.4.2'
+PYDANTIC_VERSION = '2.11.9'
+FILELOCK_VERSION = '3.19.1'
+MSGSPEC_VERSION = '0.19.0'
 ZIPREMOVE_VERSION = '0.8.0'
 
 setup(name='pysdato',
