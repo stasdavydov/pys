@@ -20,8 +20,7 @@ jobs:
         python-version: "${{ matrix.python_version }}"
     - name: Instal dependency and test environment
       run: |
-        python -m pip install -U pip setuptools
-        pip install pytest
+        python -m pip install -U pip setuptools pytest build
         python -m build
         pip install -e
     - name: Run tests
