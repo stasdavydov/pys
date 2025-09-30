@@ -9,9 +9,10 @@ PYTEST_VERSION = '8.22'
 PYDANTIC_VERSION = '2.0'
 FILELOCK_VERSION = '3.15.4'
 MSGSPEC_VERSION = '0.18.6'
+ZIPREMOVE_VERSION = '0.8.0'
 
 setup(name='pysdato',
-      version='0.0.13',
+      version='0.0.14',
       python_requires='>=3.9',
       description='Simple JSON file storage for Python dataclasses, msgspec structs and pydantic models, thread and '
                   'multiprocess safe',
@@ -31,6 +32,7 @@ setup(name='pysdato',
           "Programming Language :: Python :: 3.10",
           "Programming Language :: Python :: 3.11",
           "Programming Language :: Python :: 3.12",
+          "Programming Language :: Python :: 3.13",
           "Topic :: Database :: Database Engines/Servers",
           "Topic :: Software Development :: Libraries",
           "Topic :: Software Development :: Libraries :: Python Modules",
@@ -40,6 +42,7 @@ setup(name='pysdato',
       install_requires=[
           f'filelock >= {FILELOCK_VERSION}',
           f'msgspec >= {MSGSPEC_VERSION}',
+          f'zipremove >= {ZIPREMOVE_VERSION}',
       ],
       extras_require={
           'test': [
