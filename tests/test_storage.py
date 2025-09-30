@@ -51,6 +51,7 @@ class BotResponse(ModelWithID, ResponseContent, Created):
 storages = [
     pys.file_storage('tests.storage'),
     pys.sqlite_storage('tests.db'),
+    pys.zip_storage('test.zip'),
 ]
 
 

@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        python_version: ["3.9", "3.10", "3.11", "3.12"]
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v4
@@ -20,8 +20,9 @@ jobs:
         python-version: "${{ matrix.python_version }}"
     - name: Instal dependency and test environment
       run: |
-        python -m pip install -U pip setuptools
-        pip install msgspec pydantic pytest
-        python setup.py build install
+        python -m pip install -U pip setuptools pytest build pydantic msgspec
+        python -m build
+        ls -la dist/
+        pip install dist/*.whl
     - name: Run tests
       run: pytest tests

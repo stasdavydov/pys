@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Union, Callable, Any
 
-from . import file, sqlite
+from . import file, sqlite, zipfile
 
 
 def _random_uuid(_) -> str:
@@ -254,6 +254,10 @@ def sqlite_storage(base_path: Union[str, Path]):
     return sqlite.Storage(base_path)
 
 
+def zip_storage(base_path: Union[str, Path]):
+    return zipfile.Storage(base_path)
+
+
 storage = sqlite_storage
 
-__all__ = ('saveable', 'storage', 'file_storage', 'sqlite_storage', 'Persistent')
+__all__ = ('saveable', 'storage', 'file_storage', 'sqlite_storage', 'zip_storage', 'Persistent')

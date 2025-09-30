@@ -24,6 +24,7 @@ BOOKS = 5
 storages = (
     pys.file_storage('benchmark.storage'),
     pys.sqlite_storage('benchmark.db'),
+    pys.zip_storage('benchmark.zip'),
 )
 for s in storages:
     start = time.time_ns()
@@ -40,7 +41,7 @@ for s in storages:
 
     start = time.time_ns()
     authors_found = list(s.list(Author))
-    assert AUTHORS == len(authors_found)
+    assert AUTHORS == len(authors_found), f"Wrong number of authors: {len(authors_found)}, expected: {AUTHORS}"
     end = time.time_ns()
     t2 = end - start
     total2 = AUTHORS
