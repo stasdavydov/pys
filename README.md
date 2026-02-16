@@ -188,7 +188,7 @@ Storage: sqlite.Storage(base_path=benchmark.db)
 T1: 11.81 ms -- save 1100 objects -- 0.011 ms per object
 T3: 8.22 ms -- list 500 objects -- 0.016 ms per object
 T4: 0.00 ms -- list 500 objects -- 0.000 ms per object
-Storage: file.Storage(base_path=benchmark.zip)
+Storage: zipfile.Storage(base_path=benchmark.zip)
 T1: 31329.74 ms -- save 1100 objects -- 28.482 ms per object
 T3: 2336.20 ms -- list 500 objects -- 4.672 ms per object
 T4: 1779.96 ms -- list 500 objects -- 3.560 ms per object
