@@ -155,9 +155,13 @@ import pys
 # Initialize file storage
 storage = pys.file_storage('.path-to-storage')
 
-# Initialize SQLite (default) storage
+# Initialize default (SQLite) storage
 storage = pys.storage('path-to-storage.db')
+
+# Initialize SQLite storage
 storage = pys.sqlite_storage('path-to-storage.db')
+
+# Initialize ZIP-file storage
 storage = pys.zip_storage('path-to-storage.zip')
 
 # Save a model with optional relation to other models
