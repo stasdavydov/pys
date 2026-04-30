@@ -25,6 +25,7 @@ storages = (
     pys.file_storage('benchmark.storage'),
     pys.sqlite_storage('benchmark.db'),
     pys.zip_storage('benchmark.zip'),
+    pys.in_memory_storage(),
 )
 for s in storages:
     start = time.time_ns()
@@ -65,37 +66,7 @@ for s in storages:
 
     print(f'Storage: {s}')
     print(f'T1: {t1/NS_IN_MS:.2f} ms -- save {total1} objects -- {t1/NS_IN_MS/total1:.3f} ms per object')
-    # print(f'T2: {t2/NS_IN_MS:.2f} ms -- list {total2} objects -- {t2/1000000/total2:.6f} mks per object')
-    print(f'T3: {t3/NS_IN_MS:.2f} ms -- list {total3} objects -- {t3/NS_IN_MS/total3:.3f} ms per object')
-    print(f'T4: {t4/NS_IN_MS:.2f} ms -- list {total4} objects -- {t4/NS_IN_MS/total4:.3f} ms per object')
+    print(f'T2: {t3/NS_IN_MS:.2f} ms -- list {total3} objects -- {t3/NS_IN_MS/total3:.3f} ms per object')
+    print(f'T3: {t4/NS_IN_MS:.2f} ms -- list {total4} objects -- {t4/NS_IN_MS/total4:.3f} ms per object')
 
     s.destroy()
-
-# path.glob
-# T1: 1.28 sec
-# T2: 0.35 sec
-# T3: 2.21 sec
-# T4: 2.01 sec
-#
-# os.listdir
-# T1: 0.68 sec
-# T2: 0.24 sec
-# T3: 1.44 sec
-# T4: 1.25 sec
-
-# msgspec
-# T1: 0.62 sec
-# T2: 0.24 sec
-# T3: 1.44 sec
-# T4: 1.25 sec
-
-# SQLite storage is added
-# T1: 656.80 ms
-# T2: 264.35 ms
-# T3: 1368.96 ms
-# T4: 1182.48 ms
-# Storage: sqlite.Storage(base_path=benchmark.db)
-# T1: 20.00 ms
-# T2: 1.00 ms
-# T3: 6.51 ms
-# T4: 1.00 ms
