@@ -145,8 +145,9 @@ Library supports two storages implementation:
 - `sqlite_storage()` - SQLite based -- really fast, uses one file for all objects. Good for single process access with best performance.
 - `file_storage()` - JSON file per object storage, it is slower, but saves each object in a separate JSON file. Multiprocess- and thread-safe, but can make FS DoS with too many objects.
 - `zip_storage()` - ZIP-file based -- slow, compact, uses one file for all objects. Multiprocess- and thread-safe, compact file storage.
+- `in_memory_storage(parent=<any storage>)` - In-memory storage -- very fast, compact, stores one object via given parent storage. Multiprocess- and thread-safe depends on parent storage (file_storage is recommended.) 
 
-The default storage is SQLite based.
+The default storage is in_memory_storage based on a file_storage.
 
 ## Library Reference
 ```python
@@ -163,6 +164,9 @@ storage = pys.sqlite_storage('path-to-storage.db')
 
 # Initialize ZIP-file storage
 storage = pys.zip_storage('path-to-storage.zip')
+
+# Initialize in-memory storage with file storage backend
+storage = pys.in_memory_storage(parent=file_storage('.mem'))
 
 # Save a model with optional relation to other models
 storage.save(model, [related_model | (RelatedModelClass, related_model_id), ...])
@@ -185,20 +189,25 @@ You can find the benchmark code in `benchmark.py` file.
 
 ```
 Storage: file.Storage(base_path=benchmark.storage)
-T1: 639.64 ms -- save 1100 objects -- 0.581 ms per object
-T3: 1498.20 ms -- list 500 objects -- 2.996 ms per object
-T4: 1296.48 ms -- list 500 objects -- 2.593 ms per object
+T1: 596.98 ms -- save 1100 objects -- 0.543 ms per object
+T2: 1218.77 ms -- list 500 objects -- 2.438 ms per object
+T3: 979.78 ms -- list 500 objects -- 1.960 ms per object
 Storage: sqlite.Storage(base_path=benchmark.db)
-T1: 11.81 ms -- save 1100 objects -- 0.011 ms per object
-T3: 8.22 ms -- list 500 objects -- 0.016 ms per object
-T4: 0.00 ms -- list 500 objects -- 0.000 ms per object
-Storage: zipfile.Storage(base_path=benchmark.zip)
-T1: 31329.74 ms -- save 1100 objects -- 28.482 ms per object
-T3: 2336.20 ms -- list 500 objects -- 4.672 ms per object
-T4: 1779.96 ms -- list 500 objects -- 3.560 ms per object
+T1: 10.03 ms -- save 1100 objects -- 0.009 ms per object
+T2: 0.00 ms -- list 500 objects -- 0.000 ms per object
+T3: 0.00 ms -- list 500 objects -- 0.000 ms per object
+Storage: file.Storage(base_path=benchmark.zip)
+T1: 23195.79 ms -- save 1100 objects -- 21.087 ms per object
+T2: 2131.86 ms -- list 500 objects -- 4.264 ms per object
+T3: 1534.07 ms -- list 500 objects -- 3.068 ms per object
+Storage: in_memory.Storage(parent=file.Storage(base_path=.mem))
+T1: 710.24 ms -- save 1100 objects -- 0.646 ms per object
+T2: 16.09 ms -- list 500 objects -- 0.032 ms per object
+T3: 0.00 ms -- list 500 objects -- 0.000 ms per object
 ```
 
 ## Release Notes
+- **0.0.15** In-memory storage with any persistence backend is added. 
 - **0.0.14** ZIP-file based storage is added. 
 - **0.0.13** ID can be any type.
 - **0.0.12** Fixed: issue with file encoding for custom raw models.

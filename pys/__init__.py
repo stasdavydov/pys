@@ -5,7 +5,8 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Union, Callable, Any
 
-from . import file, sqlite, zipfile
+from . import file, sqlite, zipfile, in_memory
+from .base import BaseStorage
 
 
 def _random_uuid(_) -> str:
@@ -258,6 +259,10 @@ def zip_storage(base_path: Union[str, Path]):
     return zipfile.Storage(base_path)
 
 
-storage = sqlite_storage
+def in_memory_storage(parent: BaseStorage = file_storage('.mem')):
+    return in_memory.Storage(parent=parent)
 
-__all__ = ('saveable', 'storage', 'file_storage', 'sqlite_storage', 'zip_storage', 'Persistent')
+
+storage = in_memory_storage
+
+__all__ = ('saveable', 'storage', 'file_storage', 'sqlite_storage', 'zip_storage', 'in_memory_storage', 'Persistent')

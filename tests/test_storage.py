@@ -52,6 +52,7 @@ storages = [
     pys.file_storage('tests.storage'),
     pys.sqlite_storage('tests.db'),
     pys.zip_storage('test.zip'),
+    pys.in_memory_storage(),
 ]
 
 
