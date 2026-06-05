@@ -207,6 +207,7 @@ T3: 0.00 ms -- list 500 objects -- 0.000 ms per object
 ```
 
 ## Release Notes
+- **0.0.16** Fixed in-memory storage persistence bugs.
 - **0.0.15** In-memory storage with any persistence backend is added. 
 - **0.0.14** ZIP-file based storage is added. 
 - **0.0.13** ID can be any type.

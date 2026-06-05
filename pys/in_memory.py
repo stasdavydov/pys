@@ -12,17 +12,26 @@ class Storage(BaseStorage):
         def __my_id__():
             return 'mem'
 
+        @classmethod
+        def __factory__(cls, raw_content: str, model_id: Any):
+            import msgspec
+            content = msgspec.json.decode(raw_content)
+            return cls(**content)
+
         def __json__(self):
             return json.dumps(self)
 
     mem: Mem
 
-    def _init_mem(self):
-        self.mem = self.Mem()
+    def _init_mem(self, reset_mem: bool = False):
+        if not reset_mem:
+            self.mem = self.parent.load(self.Mem, self.Mem.__my_id__())
+        if not self.mem:
+            self.mem = self.Mem()
 
     def __init__(self, parent: BaseStorage) -> None:
-        self._init_mem()
         self.parent = parent
+        self._init_mem()
 
     @staticmethod
     def _get_model_path(model_class: Type[StoredModel], model_id: Any, *related_model: Related) -> str:
@@ -70,7 +79,7 @@ class Storage(BaseStorage):
             yield self.load(model_class, k[len(path_key):], *related_model)
 
     def destroy(self) -> None:
-        self._init_mem()
+        self._init_mem(reset_mem=True)
         self.parent.destroy()
 
     def __str__(self) -> str:
