@@ -12,7 +12,7 @@ MSGSPEC_VERSION = '0.19.0'
 ZIPREMOVE_VERSION = '0.8.0'
 
 setup(name='pysdato',
-      version='0.0.15',
+      version='0.0.16',
       python_requires='>=3.9',
       description='Simple JSON file storage for Python dataclasses, msgspec structs and pydantic models, thread and '
                   'multiprocess safe',
