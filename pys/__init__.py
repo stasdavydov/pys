@@ -58,18 +58,21 @@ class Persistent(abc.ABC):
 
 def saveable(base_cls=None, *,
              field_as_id: str = 'id',
-             default_id: Callable[[Any], str] = _random_uuid):
+             default_id: Callable[[Any], str] = _random_uuid,
+             type_hooks=None,
+             ):
     """
     Decorate the given `cls` with `__my_id__()` and `__json__()` methods
     required for persistence.
     :param base_cls: Class to decorate.
     :param field_as_id: existing class field to be used as object ID.
     :param default_id: Default ID value function (id(self) by default).
+    :param type_hooks: Custom config for `dacite` in case of use with @dataclass
     :return: Decorated class
     """
     if not base_cls:
         def wrapper(decor_cls):
-            return saveable(decor_cls, field_as_id=field_as_id)
+            return saveable(decor_cls, field_as_id=field_as_id, default_id=default_id, type_hooks=type_hooks)
 
         return wrapper
 
@@ -233,6 +236,17 @@ def saveable(base_cls=None, *,
                 # noinspection PyDataclass
                 return asdict(self)
 
+            @classmethod
+            def __factory__(cls, raw_content: str, model_id: Any) -> '_MsgspecStruct':
+                import json
+                import dacite
+                content = json.loads(raw_content)
+                return dacite.from_dict(
+                    data_class=cls,
+                    data=content,
+                    config=dacite.Config(type_hooks=type_hooks or {}),
+                )
+
         @functools.wraps(base_cls, updated=())
         class _DataclassNoId(_Dataclass, _NoIdField):
             # __slots__ = ('__my_saved_id__',)
@@ -259,8 +273,8 @@ def zip_storage(base_path: Union[str, Path]):
     return zipfile.Storage(base_path)
 
 
-def in_memory_storage(parent: BaseStorage = file_storage('.mem')):
-    return in_memory.Storage(parent=parent)
+def in_memory_storage(parent: Union[BaseStorage, None] = None):
+    return in_memory.Storage(parent=parent or file_storage('.mem'))
 
 
 storage = in_memory_storage

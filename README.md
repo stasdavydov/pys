@@ -137,6 +137,47 @@ assert war_and_peace in leo_books
 assert for_kids in leo_books
 ```
 
+### Embedded types
+If you dataclass contains fields of some custom types (i.e. other dataclasses or types like date)
+they can be automatically converted with help of `dacite` library the `pys` uses for
+dataclasses now.
+
+In case of primitive fields you don't need to specify anything extra:
+```python
+@pys.saveable(field_as_id='some_other')
+@dataclass
+class A:
+    some_other: str
+
+@pys.saveable
+@dataclass
+class B:
+    id: str
+
+@pys.saveable
+@dataclass
+class C:
+    name: str
+
+@pys.saveable
+@dataclass
+class D:
+    a: A
+    b: B
+    c: C
+```
+
+But for other types like `datetime.date` you need to specify `type_hooks` parameter
+of `@saveable`:
+```python
+@pys.saveable(field_as_id='date', type_hooks={
+    datetime.date: datetime.date.fromisoformat,
+})
+@dataclass
+class D:
+    date: datetime.date
+```
+
 ### More samples
 Please check `tests/test_samples.py` for more saveable class definitions and operations.
 
@@ -156,8 +197,8 @@ import pys
 # Initialize file storage
 storage = pys.file_storage('.path-to-storage')
 
-# Initialize default (SQLite) storage
-storage = pys.storage('path-to-storage.db')
+# Initialize default (in memory) storage
+storage = pys.storage()
 
 # Initialize SQLite storage
 storage = pys.sqlite_storage('path-to-storage.db')
@@ -207,6 +248,7 @@ T3: 0.00 ms -- list 500 objects -- 0.000 ms per object
 ```
 
 ## Release Notes
+- **0.0.17** Added support for embedded initialization for @dataclass 
 - **0.0.16** Fixed in-memory storage persistence bugs.
 - **0.0.15** In-memory storage with any persistence backend is added. 
 - **0.0.14** ZIP-file based storage is added. 
