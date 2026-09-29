@@ -45,6 +45,7 @@ setup(name='pysdato',
           f'filelock >= {FILELOCK_VERSION}',
           f'msgspec >= {MSGSPEC_VERSION}',
           f'zipremove >= {ZIPREMOVE_VERSION}',
+          f'dacite >= {DACITE_VERSION}',
       ],
       extras_require={
           'test': [
