@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pytest
 
 import pys
-from test_with_id import A, B, C
+from .test_with_id import A, B, C
 
 
 @pys.saveable
