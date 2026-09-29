@@ -10,9 +10,10 @@ PYDANTIC_VERSION = '2.11.9'
 FILELOCK_VERSION = '3.19.1'
 MSGSPEC_VERSION = '0.19.0'
 ZIPREMOVE_VERSION = '0.8.0'
+DACITE_VERSION = '1.9.2'
 
 setup(name='pysdato',
-      version='0.0.16',
+      version='0.0.17',
       python_requires='>=3.9',
       description='Simple JSON file storage for Python dataclasses, msgspec structs and pydantic models, thread and '
                   'multiprocess safe',
@@ -44,15 +45,18 @@ setup(name='pysdato',
           f'filelock >= {FILELOCK_VERSION}',
           f'msgspec >= {MSGSPEC_VERSION}',
           f'zipremove >= {ZIPREMOVE_VERSION}',
+          f'dacite >= {DACITE_VERSION}',
       ],
       extras_require={
           'test': [
               f'pytest >= {PYTEST_VERSION}',
               f'msgspec >= {MSGSPEC_VERSION}',
               f'pydantic >= {PYDANTIC_VERSION}',
+              f'dacite >= {DACITE_VERSION}',
           ],
           'dataclass': [
-              f'msgspec >= {MSGSPEC_VERSION}',
+              # f'msgspec >= {MSGSPEC_VERSION}',
+              f'dacite >= {DACITE_VERSION}',
           ],
           'msgspec': [
               f'msgspec >= {MSGSPEC_VERSION}',

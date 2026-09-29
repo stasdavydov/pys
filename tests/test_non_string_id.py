@@ -1,12 +1,14 @@
+import datetime
 from dataclasses import dataclass
-from datetime import datetime
 
 import pytest
 
 import pys
 
 
-@pys.saveable(field_as_id='date')
+@pys.saveable(field_as_id='date', type_hooks={
+    datetime.date: datetime.date.fromisoformat,
+})
 @dataclass
 class D:
     date: datetime.date
@@ -27,7 +29,7 @@ def sqlite_storage():
 
 
 def test_non_string_id(file_storage, sqlite_storage):
-    today = datetime.now().date()
+    today = datetime.date.today()
     a = D(date=today)
     assert a.__my_id__() is not None
     assert a.__json__() is not None

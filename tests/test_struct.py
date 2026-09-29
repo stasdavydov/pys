@@ -1,4 +1,5 @@
 import msgspec
+import pytest
 
 import pys
 
@@ -37,3 +38,26 @@ def test_with_id():
     assert c.__my_id__() is not None
     assert c.__json__() is not None
     assert c.__json__() == f'{{"name":"{c.name}"}}'
+
+
+@pys.saveable
+class D(msgspec.Struct):
+    a: A
+    b: B
+    c: C
+
+
+@pytest.fixture
+def storage():
+    storage = pys.file_storage('storage.db')
+    yield storage
+    storage.destroy()
+
+
+@pytest.mark.skip("We didn't support embedded for msgspec yet")
+def test_embedded(storage):
+    d = D(a=A(some_other='123'), b=B(id='456'), c=C(name='789'))
+    d_id = storage.save(d)
+    d_copy = storage.load(D, model_id=d_id)
+
+    assert d == d_copy
