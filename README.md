@@ -256,9 +256,11 @@ T3: 3.00 ms -- list 500 objects -- 0.006 ms per object
 Storage: gcs.Storage(bucket=test-bucket, prefix='tests/benchmark/')
 T1: 3065.19 ms -- save 1100 objects -- 2.787 ms per object
 T2: 1413.26 ms -- list 500 objects -- 2.827 ms per object
-T3: 1272.59 ms -- list 500 objects -- 2.545 ms per object```
+T3: 1272.59 ms -- list 500 objects -- 2.545 ms per object
+```
 
 ## Release Notes
+- **0.0.19** Downgraded GCS library version requirement to 2.18.2, fixed readme
 - **0.0.18** GCS is added as storage backend
 - **0.0.17** Added support for embedded initialization for @dataclass 
 - **0.0.16** Fixed in-memory storage persistence bugs.
