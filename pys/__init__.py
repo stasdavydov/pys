@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Union, Callable, Any
 
-from . import file, sqlite, zipfile, in_memory
+from . import file, sqlite, zipfile, in_memory, gcs
 from .base import BaseStorage
 
 
@@ -277,6 +277,14 @@ def in_memory_storage(parent: Union[BaseStorage, None] = None):
     return in_memory.Storage(parent=parent or file_storage('.mem'))
 
 
+def gcs_storage(bucket: str, prefix: str, client=None):
+    return gcs.Storage(bucket=bucket, prefix=prefix, client=client)
+
+
 storage = in_memory_storage
 
-__all__ = ('saveable', 'storage', 'file_storage', 'sqlite_storage', 'zip_storage', 'in_memory_storage', 'Persistent')
+__all__ = (
+    'saveable', 'storage',
+    'file_storage', 'sqlite_storage', 'zip_storage', 'in_memory_storage', 'gcs_storage',
+    'Persistent',
+)
