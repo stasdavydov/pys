@@ -49,16 +49,51 @@ class BotResponse(ModelWithID, ResponseContent, Created):
 
 
 storages = [
-    pys.file_storage('tests.storage'),
-    pys.sqlite_storage('tests.db'),
-    pys.zip_storage('test.zip'),
-    pys.in_memory_storage(),
+    "file",
+    "sqlite",
+    "zip",
+    "memory",
+    "gcs",
 ]
 
 
-@pytest.fixture(params=storages)
-def storage(request):
-    return request.param
+@pytest.fixture(params=storages, ids=storages)
+def storage(request, tmp_path):
+    backend = request.param
+
+    if backend == "file":
+        instance = pys.file_storage(
+            str(tmp_path / "storage")
+        )
+
+    elif backend == "sqlite":
+        instance = pys.sqlite_storage(
+            str(tmp_path / "storage.db")
+        )
+
+    elif backend == "zip":
+        instance = pys.zip_storage(
+            str(tmp_path / "storage.zip")
+        )
+
+    elif backend == "memory":
+        instance = pys.in_memory_storage()
+
+    elif backend == "gcs":
+        client = request.getfixturevalue("gcs_client")
+
+        instance = pys.gcs_storage(
+            bucket="test-bucket",
+            prefix=f"tests/{uuid.uuid4().hex}/",
+            client=client,
+        )
+
+    else:
+        raise ValueError(f"Unknown backend: {backend}")
+
+    yield instance
+
+    instance.destroy()
 
 
 def test_load(storage):
@@ -134,7 +169,3 @@ def test_list(storage):
         assert bot.id in bot_ids
 
     storage.delete(bot_owner.__class__, bot_owner.id)
-
-
-def test_tear_down(storage):
-    storage.destroy()

@@ -11,9 +11,10 @@ FILELOCK_VERSION = '3.19.1'
 MSGSPEC_VERSION = '0.19.0'
 ZIPREMOVE_VERSION = '0.8.0'
 DACITE_VERSION = '1.9.2'
+GCS_VERSION = '3.17.2'
 
 setup(name='pysdato',
-      version='0.0.17',
+      version='0.0.18',
       python_requires='>=3.9',
       description='Simple JSON file storage for Python dataclasses, msgspec structs and pydantic models, thread and '
                   'multiprocess safe',
@@ -35,6 +36,7 @@ setup(name='pysdato',
           "Programming Language :: Python :: 3.12",
           "Programming Language :: Python :: 3.13",
           "Programming Language :: Python :: 3.14",
+          "Programming Language :: Python :: 3.15",
           "Topic :: Database :: Database Engines/Servers",
           "Topic :: Software Development :: Libraries",
           "Topic :: Software Development :: Libraries :: Python Modules",
@@ -64,5 +66,8 @@ setup(name='pysdato',
           'pydantic': [
               f'pydantic >= {PYDANTIC_VERSION}',
           ],
+          'gcs': [
+              f'google-cloud-storage >= {GCS_VERSION}',
+          ]
       }
       )
