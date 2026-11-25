@@ -260,9 +260,10 @@ T3: 1272.59 ms -- list 500 objects -- 2.545 ms per object
 ```
 
 ## Release Notes
-- **0.0.19** Downgraded GCS library version requirement to 2.18.2, fixed readme
+- **0.0.20** Fixed GCS dependency: made it local for `gcs_storage` only
+- **0.0.19** Downgraded GCS library version requirement to `2.18.2`, fixed readme
 - **0.0.18** GCS is added as storage backend
-- **0.0.17** Added support for embedded initialization for @dataclass 
+- **0.0.17** Added support for embedded initialization for `@dataclass` 
 - **0.0.16** Fixed in-memory storage persistence bugs.
 - **0.0.15** In-memory storage with any persistence backend is added. 
 - **0.0.14** ZIP-file based storage is added. 
@@ -281,5 +282,5 @@ changing ID generation behaviour. By default, we use `str(uuid.uuid4())` as ID.
 Default storage is SQLite storage now.
 - **0.0.4** SQLite storage is added. Support of `msqspec` JSON and structures is added.
 - **0.0.3** Benchmark is added, performance is improved. Fixed dependency set up.
-- **0.0.2** Added support for Python 3.x < 3.10
+- **0.0.2** Added support for Python `3.x` < `3.10`
 - **0.0.1** Initial public release
