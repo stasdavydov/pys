@@ -14,7 +14,7 @@ DACITE_VERSION = '1.9.2'
 GCS_VERSION = '2.18.2'
 
 setup(name='pysdato',
-      version='0.0.20',
+      version='0.0.21',
       python_requires='>=3.9',
       description='Simple JSON file storage for Python dataclasses, msgspec structs and pydantic models, thread and '
                   'multiprocess safe',
