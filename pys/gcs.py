@@ -1,7 +1,4 @@
-
-from __future__ import annotations
-
-from typing import Any, Iterable, Optional, Type
+from typing import Any, Iterable, Optional, Type, Union
 from urllib.parse import quote, unquote
 
 from google.api_core.exceptions import NotFound
@@ -22,7 +19,7 @@ class Storage(BaseStorage):
         self,
         bucket: str,
         prefix: str,
-        client: storage.Client | None = None,
+        client: Union[storage.Client, None] = None,
     ) -> None:
         self.client = client or storage.Client()
         self.bucket = self.client.bucket(bucket)

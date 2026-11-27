@@ -214,6 +214,9 @@ storage = pys.zip_storage('path-to-storage.zip')
 # Initialize in-memory storage with file storage backend
 storage = pys.in_memory_storage(parent=file_storage('.mem'))
 
+storage_save_on_demand = pys.in_memory_storage(parent=file_storage('.mem'), auto_saving=False)
+storage_save_on_demand.persist()  # Persist in-memory changes into parent
+
 # Initialize GCS storage
 storage = pys.gcs_storage(bucket="bucket", prefix="/path/")
 
@@ -260,6 +263,7 @@ T3: 1272.59 ms -- list 500 objects -- 2.545 ms per object
 ```
 
 ## Release Notes
+- **0.0.21** Added in-memory storage on-demand persistence option
 - **0.0.20** Fixed GCS dependency: made it local for `gcs_storage` only
 - **0.0.19** Downgraded GCS library version requirement to `2.18.2`, fixed readme
 - **0.0.18** GCS is added as storage backend

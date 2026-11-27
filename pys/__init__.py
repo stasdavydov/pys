@@ -275,9 +275,9 @@ def zip_storage(base_path: Union[str, Path]):
     return zipfile.Storage(base_path)
 
 
-def in_memory_storage(parent: Union[BaseStorage, None] = None):
+def in_memory_storage(parent: Union[BaseStorage, None] = None, auto_saving: bool = True):
     from . import in_memory
-    return in_memory.Storage(parent=parent or file_storage('.mem'))
+    return in_memory.Storage(parent=parent or file_storage('.mem'), auto_saving=auto_saving)
 
 
 def gcs_storage(bucket: str, prefix: str, client=None):

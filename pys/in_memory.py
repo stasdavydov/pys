@@ -29,8 +29,9 @@ class Storage(BaseStorage):
         if not self.mem:
             self.mem = self.Mem()
 
-    def __init__(self, parent: BaseStorage) -> None:
+    def __init__(self, parent: BaseStorage, auto_saving: bool = True) -> None:
         self.parent = parent
+        self.auto_saving = auto_saving
         self._init_mem()
 
     @staticmethod
@@ -59,9 +60,13 @@ class Storage(BaseStorage):
         key = self._get_model_path(model.__class__, model_id, *related_model)
         self.mem[key] = model.__json__()
 
-        self.parent.save(self.mem)
+        if self.auto_saving:
+            self.parent.save(self.mem)
 
         return model_id
+
+    def persist(self):
+        self.parent.save(self.mem)
 
     def delete(self, model_class: Type[StoredModel], model_id: Any, *related_model: Related) -> None:
         key = self._get_model_path(model_class, model_id, *related_model)
@@ -69,7 +74,8 @@ class Storage(BaseStorage):
         for k in [k for k in self.mem.keys() if k.startswith(key)]:
             del self.mem[k]
 
-        self.parent.save(self.mem)
+        if self.auto_saving:
+            self.parent.save(self.mem)
 
     def list(self, model_class: Type[StoredModel], *related_model: Related) -> Iterable[StoredModel]:
         key = self._get_model_path(model_class, "", *related_model)
